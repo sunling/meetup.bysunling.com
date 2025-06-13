@@ -1,0 +1,12 @@
+{
+  "name": "meetup.bysunling.com",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo No build needed"
+  },
+  "keywords": [],
+  "description": "一个用于快速发起线上线下活动的小工具。",
+  "author": "Ling Sun",
+  "license": "ISC"
+}
