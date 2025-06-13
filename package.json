@@ -11,7 +11,7 @@
     "dotenv": "^16.5.0",
     "jsonwebtoken": "^9.0.2",
     "luxon": "^3.6.1",
-    "node-fetch": "^2.6.7",
+    "node-fetch": "^2.6.7"
   },
   "keywords": [],
   "description": "一个用于快速发起线上线下活动的小工具。",
