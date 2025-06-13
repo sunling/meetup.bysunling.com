@@ -1,4 +1,7 @@
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/3e5410c5-379f-4fa4-a9cf-d97d033efa0a/deploy-status)](https://app.netlify.com/projects/ins-meetup/deploys)
+
+
 # Meetup.bysunling.com
 
 这是一个用于创建和管理线下活动（Meetup）的工具。  
