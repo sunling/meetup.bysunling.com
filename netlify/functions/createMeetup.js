@@ -19,7 +19,7 @@ export async function handler(event, context) {
 
   try {
     const data = JSON.parse(event.body);
-    const { title, datetime, location, description, wechat } = data;
+    const { title, datetime, location, description, wechat, qrcode } = data;
 
     if (!title || !datetime || !location || !description || !wechat) {
       return {
@@ -37,7 +37,7 @@ export async function handler(event, context) {
       description,
       wechat_id: wechat,
       manage_token,
-      created_at: new Date().toISOString()
+      qrcode
     };
 
     const { data: inserted, error } = await supabase

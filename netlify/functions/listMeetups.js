@@ -18,7 +18,7 @@ export async function handler(event, context) {
   try {
     const { data, error } = await supabase
       .from('meetups')
-      .select('id, title, datetime, location, description')
+      .select('id, title, datetime, location, description, qrcode')
       .order('datetime', { ascending: false });
 
     if (error) {
