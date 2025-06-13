@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meetup 活动列表</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9f1ea 100%);
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2em 1.5em;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 1em;
+    }
+    .event-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5em;
+    }
+    .event-card {
+      background-color: #fff;
+      padding: 1.5em;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s ease;
+    }
+    .event-card:hover {
+      transform: translateY(-3px);
+    }
+    .event-title {
+      font-size: 1.4em;
+      font-weight: 600;
+      margin-bottom: 0.5em;
+    }
+    .event-meta {
+      color: #666;
+      font-size: 0.95em;
+      margin-bottom: 0.8em;
+    }
+    .new-meetup-btn {
+      display: inline-block;
+      background-color: #5f9b65;
+      color: #fff;
+      padding: 0.7em 1.5em;
+      border-radius: 6px;
+      text-decoration: none;
+      margin-bottom: 2em;
+      font-weight: 500;
+      transition: background-color 0.3s ease;
+    }
+    .new-meetup-btn:hover {
+      background-color: #498e52;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 Meetup 活动</h1>
+    <a class="new-meetup-btn" href="new-meetup.html">➕ 新建活动</a>
+
+    <div id="meetup-list" class="event-list">
+      加载中...
+    </div>
+  </div>
+
+  <script>
+    async function loadMeetups() {
+      try {
+        const response = await fetch('/.netlify/functions/listMeetups');
+        if (!response.ok) {
+          document.getElementById("meetup-list").innerText = "加载失败，请稍后重试。";
+          return;
+        }
+
+        const meetups = await response.json();
+        const container = document.getElementById('meetup-list');
+        container.innerHTML = '';
+
+        if (meetups.length === 0) {
+          container.innerText = "当前暂无活动，快去新建一个吧！";
+          return;
+        }
+
+        meetups.forEach(meetup => {
+          const item = document.createElement('a');
+          item.className = 'event-card';
+          item.href = `meetup.html?meetup_id=${meetup.id}`;
+          const dateText = new Date(meetup.datetime).toLocaleString("zh-CN");
+          item.innerHTML = `
+            <div class="event-title">${meetup.title}</div>
+            <div class="event-meta">📅 ${dateText} | 📍 ${meetup.location}</div>
+            <div>${(meetup.description || '').slice(0, 60)}...</div>
+          `;
+          container.appendChild(item);
+        });
+      } catch (err) {
+        console.error("加载失败:", err);
+        document.getElementById("meetup-list").innerText = "加载失败，请检查网络连接";
+      }
+    }
+
+    loadMeetups();
+  </script>
+</body>
+</html>
