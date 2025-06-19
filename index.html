@@ -245,7 +245,7 @@
   </div>
 
   <!-- 悬浮新建活动按钮 -->
-  <a href="new-meetup" class="floating-new-meetup" title="新建活动">+</a>
+  <a href="new-meetup" class="floating-new-meetup" title="点击发起活动">+</a>
 
   <script src="scripts/gradientConfig.js"></script>
   <script src="scripts/timeUtils.js"></script>
@@ -500,6 +500,19 @@
        const url = `meetup?id=${meetupId}&action=${action}`;
        window.location.href = url;
      }
+
+    // 监听浏览器回退/前进按钮
+    window.addEventListener('popstate', function(event) {
+      // 检查URL参数，如果有date参数则显示对应日期的详情，否则显示日期分组
+      const urlParams = new URLSearchParams(window.location.search);
+      const dateParam = urlParams.get('date');
+      
+      if (dateParam && allEventsByDate[dateParam]) {
+        showDateEvents(dateParam);
+      } else {
+        showDateGroups();
+      }
+    });
 
     loadEvents();
   </script>

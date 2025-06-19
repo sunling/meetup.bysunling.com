@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -191,6 +192,7 @@
             padding: 40px;
             color: #666;
         }
+
         .section-header {
             font-size: 1.3rem;
             font-weight: bold;
@@ -203,6 +205,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -257,7 +260,7 @@
 
         function displayMeetups(meetups) {
             const meetupsList = document.getElementById('meetupsList');
-            
+
             if (meetups.length === 0) {
                 meetupsList.innerHTML = '<div class="message">暂无活动</div>';
                 return;
@@ -271,7 +274,7 @@
                 const status = meetup.status || 'pending';
                 return status === 'pending';
             });
-            
+
             const reviewedMeetups = meetups.filter(meetup => {
                 const status = meetup.status || 'pending';
                 return status !== 'pending';
@@ -369,7 +372,8 @@
     </script>
 
     <!-- 悬浮新建活动按钮 -->
-    <a href="new-meetup" class="floating-new-meetup" title="新建活动">+</a>
+    <a href="new-meetup" class="floating-new-meetup" title="点击发起活动">+</a>
 
 </body>
+
 </html>

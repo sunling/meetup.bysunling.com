@@ -50,8 +50,8 @@
   position: fixed;
   bottom: 30px;
   right: 30px;
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   background: linear-gradient(135deg, #ff6b9d 0%, #ffa726 50%, #42a5f5 100%);
   border-radius: 50%;
   display: flex;
@@ -59,23 +59,76 @@
   justify-content: center;
   text-decoration: none;
   color: white;
-  font-size: 24px;
+  font-size: 32px;
   font-weight: bold;
-  box-shadow: 0 4px 20px rgba(255, 107, 157, 0.4);
+  box-shadow: 0 6px 30px rgba(255, 107, 157, 0.6);
   transition: all 0.3s ease;
   z-index: 1000;
-  border: none;
+  border: 3px solid rgba(255, 255, 255, 0.3);
   cursor: pointer;
 }
 
+.floating-new-meetup::before {
+  content: attr(title);
+  position: absolute;
+  right: 90px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(45, 55, 72, 0.95);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+  z-index: 1001;
+}
+
+.floating-new-meetup::after {
+  content: '';
+  position: absolute;
+  right: 80px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid rgba(45, 55, 72, 0.95);
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 1001;
+}
+
 .floating-new-meetup:hover {
-  transform: scale(1.1) translateY(-2px);
-  box-shadow: 0 8px 30px rgba(255, 107, 157, 0.6);
+  transform: scale(1.15) translateY(-3px);
+  box-shadow: 0 12px 40px rgba(255, 107, 157, 0.8);
   background: linear-gradient(135deg, #e55a8a 0%, #f57c00 50%, #1976d2 100%);
+  border: 3px solid rgba(255, 255, 255, 0.6);
 }
 
 .floating-new-meetup:active {
   transform: scale(0.95);
+}
+
+.floating-new-meetup:hover::before,
+.floating-new-meetup:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+.floating-new-meetup:hover::before {
+  transform: translateY(-50%) translateX(-5px);
+}
+
+.floating-new-meetup:hover::after {
+  transform: translateY(-50%) translateX(-5px);
 }
 
 /* 全局样式重置 */
