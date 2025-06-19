@@ -249,7 +249,7 @@
   <div class="container">
     <div class="page-header mb-4">
       <h1 class="title-dopamine">活动管理页</h1>
-      <a href="index.html" class="btn btn-dopamine home-link">回到首页</a>
+      <a href="index" class="btn btn-dopamine home-link">回到首页</a>
     </div>
     
     <div class="card mb-4" id="meetup-info">
@@ -314,7 +314,7 @@
         const { meetup, rsvps } = result;
 
         // Get public URL for sharing
-        const publicUrl = `${window.location.origin}/meetup?meetup_id=${meetup.id}`;
+        const publicUrl = `${window.location.origin}/meetup?id=${meetup.id}`;
 
         document.getElementById("meetup-info").innerHTML = `
           <div class="card-body">
@@ -711,7 +711,7 @@
   </script>
 
   <!-- 悬浮新建活动按钮 -->
-  <a href="new-meetup.html" class="floating-new-meetup" title="新建活动">+</a>
+  <a href="new-meetup" class="floating-new-meetup" title="新建活动">+</a>
 
 </body>
 </html>

@@ -115,7 +115,7 @@
 <body>
   <div class="container">
     <h1 class="title-dopamine">发起活动</h1>
-    <a href="index.html" class="home-link">🏠 回到首页</a>
+    <a href="index" class="home-link">🏠 回到首页</a>
 
     <label>活动标题</label>
     <input id="title" placeholder="请输入活动标题"/>
@@ -248,7 +248,7 @@
       const result = await response.json();
 
       if (response.ok) {
-        const manageLink = `${window.location.origin}/meetup-manage.html?token=${result.manage_token}`;
+        const manageLink = `${window.location.origin}/meetup-manage?token=${result.manage_token}`;
         
         // 直接跳转到管理页面
         window.location.href = manageLink;

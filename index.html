@@ -238,15 +238,17 @@
     <div id="event-details" class="event-details" style="display: none;">
       <div class="event-details-header">
         <h3 id="selected-date-title"></h3>
-        <a href="index.html" class="home-link" onclick="showDateGroups(); return false;">回到首页</a>
+        <a href="index" class="home-link" onclick="showDateGroups(); return false;">回到首页</a>
       </div>
       <div class="event-list" id="selected-date-events"></div>
     </div>
   </div>
 
   <!-- 悬浮新建活动按钮 -->
-  <a href="new-meetup.html" class="floating-new-meetup" title="新建活动">+</a>
+  <a href="new-meetup" class="floating-new-meetup" title="新建活动">+</a>
 
+  <script src="scripts/gradientConfig.js"></script>
+  <script src="scripts/timeUtils.js"></script>
   <script>
     function categorizeEventsByTime(meetups) {
       const now = new Date();
@@ -276,7 +278,7 @@
     function createEventCard(meetup) {
       const item = document.createElement('a');
       item.className = 'event-card';
-      item.href = `meetup.html?meetup_id=${meetup.id}`;
+      item.href = `meetup?id=${meetup.id}`;
       const dateText = new Date(meetup.datetime).toLocaleString("zh-CN");
       const rsvpCount = meetup.rsvp_count || 0;
       item.innerHTML = `
@@ -331,6 +333,13 @@
         
         displayDateGroups(eventsByDate);
         
+        // 检查URL参数，如果有date参数则自动显示对应日期的详情
+        const urlParams = new URLSearchParams(window.location.search);
+        const dateParam = urlParams.get('date');
+        if (dateParam && allEventsByDate[dateParam]) {
+          showDateEvents(dateParam);
+        }
+        
       } catch (error) {
         console.error('加载活动失败:', error);
         document.getElementById('date-groups').innerHTML = '<div class="loading">加载失败</div>';
@@ -342,11 +351,13 @@
       
       events.forEach(event => {
         const eventDate = new Date(event.datetime);
-        const dateKey = eventDate.toISOString().split('T')[0]; // YYYY-MM-DD
+        const dateKey = TimeUtils.getLocalDateKey(event.datetime); // 使用本地时间生成日期键
         
         if (!groups[dateKey]) {
+          // 创建基于本地日期的Date对象
+          const localDate = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
           groups[dateKey] = {
-            date: eventDate,
+            date: localDate,
             events: []
           };
         }
@@ -371,6 +382,11 @@
       const dateStr = formatDateForDisplay(group.date);
       const weekday = group.date.toLocaleDateString('zh-CN', { weekday: 'long' });
       
+      // 更新URL参数，添加日期参数
+      const url = new URL(window.location);
+      url.searchParams.set('date', dateKey);
+      window.history.pushState({}, '', url);
+      
       document.getElementById('selected-date-title').innerHTML = `${dateStr} ${weekday}`;
       
       const eventsHtml = group.events.map(event => {
@@ -382,7 +398,7 @@
         return `
           <div class="event-card">
             <div class="event-time">${time}</div>
-            <div class="event-title">${event.title}</div>
+            <div class="event-title"><a href="meetup?id=${event.id}" style="text-decoration: none; color: inherit;">${event.title}</a></div>
             <div class="event-description">${event.description || ''}</div>
             <div class="event-location">${event.location || ''}</div>
             <div class="event-actions">
@@ -400,6 +416,11 @@
     }
     
     function showDateGroups() {
+      // 清除URL中的日期参数
+      const url = new URL(window.location);
+      url.searchParams.delete('date');
+      window.history.pushState({}, '', url);
+      
       document.getElementById('date-groups').style.display = 'grid';
       document.getElementById('event-details').style.display = 'none';
       // 原新建活动按钮已移除
@@ -423,7 +444,7 @@
       // 保存数据供详情页使用
       allEventsByDate = {};
       dateGroups.forEach(group => {
-        const dateKey = group.date.toISOString().split('T')[0];
+        const dateKey = TimeUtils.getLocalDateKey(group.events[0].datetime); // 使用第一个事件的时间生成本地日期键
         allEventsByDate[dateKey] = group;
       });
       
@@ -476,7 +497,7 @@
      
      function goToMeetup(meetupId, action) {
        // 跳转到活动详情页面，并传递动作参数
-       const url = `meetup.html?meetup_id=${meetupId}&action=${action}`;
+       const url = `meetup?id=${meetupId}&action=${action}`;
        window.location.href = url;
      }
 

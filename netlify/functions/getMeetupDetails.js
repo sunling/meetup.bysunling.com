@@ -16,7 +16,7 @@ export async function handler(event, context) {
   }
 
   const token = event.queryStringParameters.token;
-  const meetup_id = event.queryStringParameters.meetup_id;
+  const meetup_id = event.queryStringParameters.id;
 
   try {
     let meetup = null;
