@@ -587,14 +587,6 @@
       <p>扫描下方二维码加入活动微信群，获取最新活动信息和与其他参与者交流：</p>
       <img src="https://via.placeholder.com/200x200/FFB6C1/666666?text=微信群二维码" alt="微信群二维码" class="qr-code-image">
       <p style="font-size: 0.9em; margin-top: 1em;">如果二维码过期，请联系活动组织者</p>
-<<<<<<< HEAD
-=======
-    </div>
-    
-    <div class="share-section">
-      <button id="share-button" class="action-button">📤 复制活动链接</button>
-      <p id="share-message"></p>
->>>>>>> c03f9c93022198357cfb953358da361df23e94f2
     </div>
     
     <div class="share-section" style="padding: 20px 40px; border-top: 1px solid #e0e0e0;">
@@ -732,12 +724,8 @@
       const rsvpStatus = document.getElementById('rsvp-status');
       const cancelButton = document.getElementById('cancel-rsvp-button');
       const rsvpButtons = document.getElementById('rsvp-buttons');
-<<<<<<< HEAD
       const goingButton = document.getElementById('going-button');
       const maybeButton = document.getElementById('maybe-button');
-=======
->>>>>>> c03f9c93022198357cfb953358da361df23e94f2
-      const qrCodeSection = document.getElementById('qr-code-section');
       
       if (userRsvp) {
         // User has an RSVP
@@ -802,11 +790,7 @@
             qrCodeImg.src = meetup.qrcode;
           }
         }
-<<<<<<< HEAD
         // Format datetime in user's local timezone
-=======
-        // Format datetime with timezone information
->>>>>>> c03f9c93022198357cfb953358da361df23e94f2
         const formatDateTime = (datetimeStr) => {
           const date = new Date(datetimeStr);
           
