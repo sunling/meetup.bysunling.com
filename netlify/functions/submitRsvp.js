@@ -26,6 +26,21 @@ export async function handler(event) {
       };
     }
 
+    // Check if meetup exists and is approved (or legacy null status)
+    const { data: meetup, error: meetupError } = await supabase
+      .from('meetups')
+      .select('id, status')
+      .eq('id', meetup_id)
+      .or('status.eq.approved,status.is.null')
+      .maybeSingle();
+
+    if (meetupError || !meetup) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ error: 'Meetup not found or not approved for registration' }),
+      };
+    }
+
     const { data, error } = await supabase
       .from('meetup_rsvps')
       .insert([{ meetup_id, name, wechat_id, status }])

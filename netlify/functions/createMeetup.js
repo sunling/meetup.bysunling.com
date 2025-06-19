@@ -1,6 +1,6 @@
 // netlify/functions/createMeetup.js
 import { createClient } from '@supabase/supabase-js'
-import { v4 as uuidv4 } from 'uuid'
+import { randomUUID } from 'crypto'
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -28,7 +28,7 @@ export async function handler(event, context) {
       };
     }
 
-    const manage_token = uuidv4();
+    const manage_token = randomUUID();
 
     const record = {
       title,
@@ -37,7 +37,8 @@ export async function handler(event, context) {
       description,
       wechat_id: wechat,
       manage_token,
-      qrcode
+      qrcode,
+      status: 'approved'
     };
 
     const { data: inserted, error } = await supabase
