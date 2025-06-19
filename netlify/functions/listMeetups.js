@@ -16,22 +16,38 @@ export async function handler(event, context) {
   }
 
   try {
-    const { data, error } = await supabase
+    // First get all meetups
+    const { data: meetups, error: meetupsError } = await supabase
       .from('meetups')
       .select('id, title, datetime, location, description, qrcode, status')
       .or('status.eq.approved,status.is.null')
       .order('datetime', { ascending: false });
 
-    if (error) {
+    if (meetupsError) {
       return {
         statusCode: 500,
         body: JSON.stringify({ error: 'Failed to fetch meetups' }),
       };
     }
 
+    // Get RSVP counts for each meetup
+    const meetupsWithCounts = await Promise.all(
+      meetups.map(async (meetup) => {
+        const { count, error: countError } = await supabase
+          .from('meetup_rsvps')
+          .select('*', { count: 'exact', head: true })
+          .eq('meetup_id', meetup.id);
+
+        return {
+          ...meetup,
+          rsvp_count: countError ? 0 : (count || 0)
+        };
+      })
+    );
+
     return {
       statusCode: 200,
-      body: JSON.stringify(data),
+      body: JSON.stringify(meetupsWithCounts),
     };
   } catch (err) {
     return {

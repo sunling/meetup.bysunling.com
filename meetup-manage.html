@@ -3,193 +3,294 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>管理 Meetup 活动</title>
+  <title>管理活动信息</title>
+  <script src="./scripts/timeUtils.js"></script>
+  <link rel="stylesheet" href="./styles/shared.css">
   <style>
-    :root {
-      --primary-color: #5f9b65;
-      --primary-light: #7ab17f;
-      --secondary-color: #f0b660;
-      --text-color: #333333;
-      --light-text: #666666;
-      --bg-color: #f8f9fa;
-      --card-bg: #ffffff;
-      --border-color: #e6e6e6;
-    }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      line-height: 1.6;
-    }
-    
     .container {
       max-width: 800px;
-      margin: 0 auto;
-      padding: 2em 1.5em;
+      padding: 2rem 1.5rem;
     }
     
     .page-header {
-      margin-bottom: 2em;
+      position: relative;
     }
     
-    h1 {
-      font-size: 2.2em;
-      margin-bottom: 0.5em;
-      font-weight: 600;
-      color: var(--text-color);
+    .home-link {
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: 0.9rem;
     }
     
-    h2 {
-      font-size: 1.3em;
-      margin-bottom: 1em;
-      margin-top: 0;
-      color: var(--primary-color);
+    /* 内容区域样式 */
+    .content-section {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 107, 157, 0.15);
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(10px);
+    }
+    
+    .content-section:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    /* 链接框样式 */
+    .link-box {
+      background: linear-gradient(135deg, rgba(255, 107, 157, 0.08) 0%, rgba(66, 165, 245, 0.06) 100%);
+      border: 1px solid rgba(255, 107, 157, 0.15);
+      border-radius: var(--radius-md);
+      padding: 1rem;
       display: flex;
       align-items: center;
+      gap: 1rem;
+      transition: all var(--transition-fast);
     }
     
-    h2::before {
-      content: '';
-      display: inline-block;
-      width: 8px;
-      height: 24px;
-      background: var(--primary-light);
-      margin-right: 10px;
-      border-radius: 4px;
+    .link-box:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 107, 157, 0.15);
     }
     
-    .section {
-      background: var(--card-bg);
-      padding: 1.8em;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      margin-bottom: 2em;
+    .link-box input {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.75rem;
+      font-size: 0.9rem;
+      font-family: 'SF Mono', 'Monaco', monospace;
     }
     
-    .meetup-meta {
-      margin-bottom: 1.5em;
+    .link-box input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(255, 107, 157, 0.2);
     }
     
-    .meetup-meta p {
-      margin: 0.8em 0;
-    }
-    
-    .meetup-meta strong {
+    .link-label {
+      min-width: 120px;
       font-weight: 500;
-      color: var(--light-text);
+      color: var(--text-light);
+      font-size: 0.9rem;
     }
     
-    .meetup-description {
-      white-space: pre-line;
-      background: rgba(0, 0, 0, 0.02);
-      padding: 1.2em;
-      border-radius: 8px;
-      border-left: 4px solid var(--primary-light);
-      margin-top: 1.5em;
+    /* QR码管理样式 */
+    .qr-current {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light);
     }
     
+    .qr-current img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: var(--radius-lg);
+      border: 2px solid var(--primary-color);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .qr-upload {
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: var(--radius-lg);
+      border: 1px dashed rgba(255, 107, 157, 0.3);
+    }
+    
+    .qr-upload input[type="file"] {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      transition: all var(--transition-fast);
+    }
+    
+    .qr-upload input[type="file"]:hover {
+      border-color: var(--primary-color);
+    }
+    
+    .qr-preview {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: var(--radius-lg);
+      border: 2px solid var(--primary-color);
+      box-shadow: var(--shadow-md);
+    }
+    
+    /* RSVP列表样式 */
     .rsvp-list {
       list-style: none;
-      padding-left: 0;
+      padding: 0;
       margin: 0;
     }
     
-    .rsvp-list li {
-      margin-bottom: 0.8em;
-      padding: 0.8em 1em;
-      background: rgba(0, 0, 0, 0.02);
-      border-radius: 6px;
+    .rsvp-item {
+      padding: 1rem;
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      transition: all var(--transition-fast);
     }
     
-    .rsvp-list .status-going {
-      border-left: 3px solid var(--primary-color);
+    .rsvp-item:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
     }
     
-    .rsvp-list .status-maybe {
-      border-left: 3px solid var(--secondary-color);
+    .rsvp-item.status-going {
+      border-left: 4px solid var(--success-color);
+      background: linear-gradient(135deg, rgba(102, 187, 106, 0.1) 0%, var(--bg-card) 100%);
+    }
+    
+    .rsvp-item.status-maybe {
+      border-left: 4px solid var(--warning-color);
+      background: linear-gradient(135deg, rgba(255, 235, 59, 0.1) 0%, var(--bg-card) 100%);
     }
     
     .rsvp-header {
       font-weight: 600;
-      margin: 1.5em 0 0.8em 0;
-      color: var(--light-text);
+      color: var(--text-light);
+      font-size: 1.1rem;
     }
     
-    .share-box {
+    /* 状态消息样式 */
+    .status-message {
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      display: none;
+    }
+    
+    .status-message.success {
+      background: var(--success-light);
+      color: var(--success-dark);
+      border: 1px solid var(--success-color);
+    }
+    
+    .status-message.error {
+      background: #ffeaea;
+      color: #d32f2f;
+      border: 1px solid #ffcdd2;
+    }
+    
+    /* 编辑表单样式 */
+    .edit-form {
+      display: none;
+    }
+    
+    .form-actions {
       display: flex;
-      align-items: center;
-      background-color: rgba(95, 155, 101, 0.1);
-      padding: 1em;
-      border-radius: 8px;
-      margin-top: 1.5em;
+      gap: 1rem;
     }
     
-    .share-box input {
-      flex: 1;
-      padding: 0.6em;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      margin-right: 1em;
-      font-size: 0.9em;
+    /* 活动描述样式 */
+    .meetup-description {
+      white-space: pre-line;
+      background: linear-gradient(135deg, rgba(255, 107, 157, 0.08) 0%, rgba(66, 165, 245, 0.06) 100%);
+      padding: 1.5rem;
+      border-radius: var(--radius-lg);
+      /* border-left: 4px solid var(--primary-color); */
+      line-height: 1.7;
     }
     
-    .action-button {
-      display: inline-block;
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 0.6em 1.2em;
-      border-radius: 4px;
-      cursor: pointer;
-      text-align: center;
-      transition: background-color 0.2s ease;
+    /* 活动元信息样式 */
+    .meetup-meta p {
+      line-height: 1.6;
     }
     
-    .action-button:hover {
-      background-color: var(--primary-light);
+    .meetup-meta strong {
+      font-weight: 600;
+      color: var(--text-light);
     }
     
+    /* 响应式设计 */
     @media (max-width: 768px) {
       .container {
-        padding: 1em;
+        padding: 1rem;
       }
       
-      h1 {
-        font-size: 1.8em;
+      .home-link {
+        position: static;
+        display: block;
+        text-align: center;
       }
       
-      .section {
-        padding: 1.2em;
-      }
-      
-      .share-box {
+      .link-box {
         flex-direction: column;
         align-items: stretch;
+        gap: 0.75rem;
       }
       
-      .share-box input {
-        margin-right: 0;
-        margin-bottom: 0.8em;
+      .link-label {
+        min-width: auto;
+      }
+      
+      .qr-current {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+      }
+      
+      .form-actions {
+        flex-direction: column;
       }
     }
   </style>
+   
 </head>
 <body>
   <div class="container">
-    <div class="page-header">
-      <h1>📋 Meetup 活动管理页</h1>
+    <div class="page-header mb-4">
+      <h1 class="title-dopamine">活动管理页</h1>
+      <a href="index.html" class="btn btn-dopamine home-link">🏠 回到首页</a>
     </div>
     
-    <div class="section" id="meetup-info">
-      <p>正在加载活动信息...</p>
+    <div class="card mb-4" id="meetup-info">
+      <div class="card-body">
+        <h2 class="subtitle-dopamine mb-3">活动信息</h2>
+        <div class="content-section">
+          <p>正在加载活动信息...</p>
+        </div>
+      </div>
     </div>
 
-    <div class="section" id="rsvp-info">
-      <h2>参与者列表</h2>
-      <p>加载中...</p>
+    <div class="card mb-4" id="qr-manage">
+      <div class="card-body">
+        <h2 class="subtitle-dopamine mb-3">微信群二维码管理</h2>
+        <div class="content-section">
+          <div class="qr-current mb-3" id="qr-current">
+            <img id="current-qr-img" src="" alt="当前二维码" style="display: none;">
+            <div class="qr-info">
+              <p><strong>当前二维码状态：</strong><span id="qr-status">加载中...</span></p>
+              <p class="text-muted">二维码会定期过期，请及时更新以确保新成员能够加入微信群。</p>
+            </div>
+          </div>
+          
+          <div class="qr-upload mt-3">
+            <h3 class="mb-3">上传新的二维码</h3>
+            <input type="file" id="qr-file-input" accept="image/*" class="mb-3" />
+            <img id="qr-preview" class="qr-preview mb-3" style="display: none;" />
+            <button class="btn btn-dopamine" id="update-qr-btn" disabled>更新二维码</button>
+            <div class="status-message mt-3" id="update-status"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="rsvp-info">
+      <div class="card-body">
+        <h2 class="subtitle-dopamine mb-3">参与者列表</h2>
+        <div class="content-section">
+          <p>加载中...</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -215,52 +316,115 @@
         // Get public URL for sharing
         const publicUrl = `${window.location.origin}/meetup?meetup_id=${meetup.id}`;
 
-        // Format datetime with timezone information
-        const formatDateTime = (datetimeStr) => {
-          const date = new Date(datetimeStr);
-          
-          // Format in user's local timezone
-          const localTimeStr = date.toLocaleString();
-          
-          // Since we know the time was stored in Pacific Time (GMT-7)
-          const originalTzInfo = `（原始时区：GMT-07:00）`;
-          
-          return `${localTimeStr} ${originalTzInfo}`;
-        };
-
         document.getElementById("meetup-info").innerHTML = `
-          <h2>${meetup.title}</h2>
-          <div class="meetup-meta">
-            <p><strong>时间：</strong> ${formatDateTime(meetup.datetime)}</p>
-            <p><strong>地点：</strong> ${meetup.location}</p>
-            <p><strong>发起人微信号：</strong> ${meetup.wechat_id}</p>
-          </div>
-          <div class="meetup-description">${meetup.description}</div>
+          <div class="card-body">
+            <h2 class="subtitle-dopamine mb-3">活动信息</h2>
+            <div class="content-section" id="meetup-display">
+              <h3 id="display-title" class="mb-3">${meetup.title}</h3>
+              <div class="meetup-meta mb-3">
+                <p><strong>时间：</strong> <span id="display-datetime">${formatDateTime(meetup.datetime)}</span></p>
+                <p><strong>地点：</strong> <span id="display-location">${meetup.location}</span></p>
+                <p><strong>发起人微信号：</strong> ${meetup.wechat_id}</p>
+              </div>
+              <div class="meetup-description mb-4" id="display-description">${meetup.description}</div>
+              
+              <div class="link-box mb-3">
+                <span class="link-label">📋 管理页面链接：</span>
+                <input type="text" value="${window.location.href}" readonly onclick="this.select()">
+                <button class="btn btn-secondary" id="copy-manage-button">复制</button>
+              </div>
+              <div class="link-box mb-3">
+                <span class="link-label">🔗 活动报名链接：</span>
+                <input type="text" value="${publicUrl}" readonly onclick="this.select()">
+                <button class="btn btn-secondary" id="copy-signup-button">复制</button>
+              </div>
+              
+              <div class="text-center">
+                <button class="btn btn-dopamine" id="edit-button">编辑活动信息</button>
+              </div>
+            </div>
           
-          <div class="share-box">
-            <input type="text" value="${publicUrl}" readonly onclick="this.select()">
-            <button class="action-button" id="copy-button">复制链接</button>
+          <div class="edit-form content-section mt-3" id="edit-form">
+            <h3 class="mb-3">编辑活动信息</h3>
+            <div class="form-group">
+              <label for="edit-title" class="form-label">活动标题</label>
+              <input type="text" id="edit-title" class="form-input" value="${meetup.title}">
+            </div>
+            <div class="form-group">
+              <label for="edit-datetime" class="form-label">活动时间</label>
+              <input type="datetime-local" id="edit-datetime" class="form-input" value="${TimeUtils.formatDateTimeForInput(meetup.datetime)}">
+            </div>
+            <div class="form-group">
+              <label for="edit-location" class="form-label">活动地点</label>
+              <input type="text" id="edit-location" class="form-input" value="${meetup.location}">
+            </div>
+            <div class="form-group">
+              <label for="edit-description" class="form-label">活动详情</label>
+              <textarea id="edit-description" class="form-input form-textarea">${meetup.description}</textarea>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-dopamine" id="save-button">保存修改</button>
+              <button class="btn btn-secondary" id="cancel-button">取消</button>
+            </div>
+            <div class="status-message mt-3" id="edit-status"></div>
           </div>
+        </div>
         `;
 
-        // Add copy link functionality
-        document.getElementById("copy-button").addEventListener("click", async () => {
-          const input = document.querySelector('.share-box input');
-          input.select();
-          try {
-            await navigator.clipboard.writeText(input.value);
-            const button = document.getElementById("copy-button");
-            button.textContent = "✅ 已复制";
-            setTimeout(() => {
-              button.textContent = "复制链接";
-            }, 2000);
-          } catch (err) {
-            alert("复制失败，请手动复制");
+        // Display current QR code
+        displayCurrentQRCode(meetup.qrcode);
+        
+        // Initialize QR code management
+        initQRCodeManagement(token);
+        
+        // Initialize edit functionality
+        initEditFunctionality(token, meetup);
+
+        // Add copy management link functionality
+        document.getElementById("copy-manage-button").addEventListener("click", async () => {
+          const button = document.getElementById("copy-manage-button");
+          const input = button.parentElement.querySelector('input');
+          if (input) {
+            input.select();
+            try {
+              await navigator.clipboard.writeText(input.value);
+              button.textContent = "✅ 已复制";
+              setTimeout(() => {
+                button.textContent = "复制管理链接";
+              }, 2000);
+            } catch (err) {
+              alert("复制失败，请手动复制");
+            }
+          }
+        });
+        
+        // Add copy signup link functionality
+        document.getElementById("copy-signup-button").addEventListener("click", async () => {
+          const button = document.getElementById("copy-signup-button");
+          const input = button.parentElement.querySelector('input');
+          if (input) {
+            input.select();
+            try {
+              await navigator.clipboard.writeText(input.value);
+              button.textContent = "✅ 已复制";
+              setTimeout(() => {
+                button.textContent = "复制报名链接";
+              }, 2000);
+            } catch (err) {
+              alert("复制失败，请手动复制");
+            }
           }
         });
 
         if (!Array.isArray(rsvps) || rsvps.length === 0) {
-          document.getElementById("rsvp-info").innerHTML = `<h2>参与者列表</h2><p>目前还没有人报名。</p>`;
+          document.getElementById("rsvp-info").innerHTML = `
+            <div class="card-body">
+              <h2 class="subtitle-dopamine mb-3">参与者列表</h2>
+              <div class="content-section">
+                <p class="text-center text-muted">目前还没有人报名。</p>
+              </div>
+            </div>
+          `;
           return;
         }
 
@@ -268,16 +432,20 @@
         const going = rsvps.filter(item => item.status === 'going');
         const maybe = rsvps.filter(item => item.status === 'maybe');
         
-        let rsvpContent = `<h2>参与者列表</h2>`;
+        let rsvpContent = `
+          <div class="card-body">
+            <h2 class="subtitle-dopamine mb-3">参与者列表</h2>
+            <div class="content-section">
+        `;
         
         // Add going RSVPs
         if (going.length > 0) {
-          rsvpContent += `<div class="rsvp-header">确定参加 (${going.length})</div>`;
-          rsvpContent += `<ul class="rsvp-list">`;
+          rsvpContent += `<div class="rsvp-header mb-2">确定参加 (${going.length})</div>`;
+          rsvpContent += `<ul class="rsvp-list mb-4">`;
           
           for (const item of going) {
             rsvpContent += `
-              <li class="status-going">${item.name}（微信号：${item.wechat_id}）</li>
+              <li class="rsvp-item status-going mb-2">${item.name}（微信号：${item.wechat_id}）</li>
             `;
           }
           
@@ -286,17 +454,22 @@
         
         // Add maybe RSVPs
         if (maybe.length > 0) {
-          rsvpContent += `<div class="rsvp-header">感兴趣 (${maybe.length})</div>`;
+          rsvpContent += `<div class="rsvp-header mb-2">感兴趣 (${maybe.length})</div>`;
           rsvpContent += `<ul class="rsvp-list">`;
           
           for (const item of maybe) {
             rsvpContent += `
-              <li class="status-maybe">${item.name}（微信号：${item.wechat_id}）</li>
+              <li class="rsvp-item status-maybe mb-2">${item.name}（微信号：${item.wechat_id}）</li>
             `;
           }
           
           rsvpContent += `</ul>`;
         }
+        
+        rsvpContent += `
+            </div>
+          </div>
+        `;
 
         document.getElementById("rsvp-info").innerHTML = rsvpContent;
       } catch (err) {
@@ -305,6 +478,236 @@
     }
 
     loadMeetupData();
+
+    // QR Code management functions
+    function displayCurrentQRCode(qrcode) {
+      const qrImg = document.getElementById('current-qr-img');
+      const qrStatus = document.getElementById('qr-status');
+      
+      if (qrcode) {
+        qrImg.src = qrcode;
+        qrImg.style.display = 'block';
+        qrStatus.textContent = '已设置';
+      } else {
+        qrImg.style.display = 'none';
+        qrStatus.textContent = '未设置';
+      }
+    }
+
+    function initQRCodeManagement(token) {
+      const fileInput = document.getElementById('qr-file-input');
+      const preview = document.getElementById('qr-preview');
+      const updateBtn = document.getElementById('update-qr-btn');
+      const statusDiv = document.getElementById('update-status');
+      
+      let qrcodeBase64 = '';
+      
+      // Handle file selection
+      fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            qrcodeBase64 = e.target.result;
+            preview.src = qrcodeBase64;
+            preview.style.display = 'block';
+            updateBtn.disabled = false;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      
+      // Handle QR code update
+      updateBtn.addEventListener('click', async function() {
+        if (!qrcodeBase64) {
+          showStatus('请先选择一个图片文件', 'error');
+          return;
+        }
+        
+        updateBtn.disabled = true;
+        updateBtn.textContent = '上传中...';
+        
+        try {
+          // First upload the image
+          const uploadRes = await fetch('/.netlify/functions/uploadImageToGitHub', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ base64Image: qrcodeBase64 })
+          });
+          
+          const uploadResult = await uploadRes.json();
+          
+          if (!uploadRes.ok || uploadResult.error) {
+            throw new Error(uploadResult.error || '图片上传失败');
+          }
+          
+          const qrcodeUrl = uploadResult.url;
+          
+          // Then update the meetup with new QR code URL
+          const updateRes = await fetch('/.netlify/functions/updateMeetup', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ token, qrcode: qrcodeUrl })
+          });
+          
+          const updateResult = await updateRes.json();
+          
+          if (!updateRes.ok || updateResult.error) {
+            throw new Error(updateResult.error || '二维码更新失败');
+          }
+          
+          // Update the display
+          displayCurrentQRCode(qrcodeUrl);
+          
+          // Reset the form
+          fileInput.value = '';
+          preview.style.display = 'none';
+          qrcodeBase64 = '';
+          
+          showStatus('二维码更新成功！', 'success');
+          
+        } catch (error) {
+          console.error('Update error:', error);
+          showStatus(`更新失败：${error.message}`, 'error');
+        } finally {
+          updateBtn.disabled = false;
+          updateBtn.textContent = '更新二维码';
+        }
+      });
+      
+      function showStatus(message, type) {
+        statusDiv.textContent = message;
+        statusDiv.className = `status-message ${type}`;
+        statusDiv.style.display = 'block';
+        
+        setTimeout(() => {
+          statusDiv.style.display = 'none';
+        }, 5000);
+      }
+    }
+    
+    // Edit functionality
+    function initEditFunctionality(token, meetup) {
+      const editButton = document.getElementById('edit-button');
+      const cancelButton = document.getElementById('cancel-button');
+      const saveButton = document.getElementById('save-button');
+      const editForm = document.getElementById('edit-form');
+      const meetupDisplay = document.getElementById('meetup-display');
+      const successSummary = document.getElementById('success-summary');
+      const editStatus = document.getElementById('edit-status');
+      
+      // Show edit form
+      editButton.addEventListener('click', () => {
+        editForm.style.display = 'block';
+        meetupDisplay.style.display = 'none';
+      });
+      
+      // Cancel editing
+      cancelButton.addEventListener('click', () => {
+        editForm.style.display = 'none';
+        meetupDisplay.style.display = 'block';
+        // Reset form values
+        document.getElementById('edit-title').value = meetup.title;
+        document.getElementById('edit-datetime').value = TimeUtils.formatDateTimeForInput(meetup.datetime);
+        document.getElementById('edit-location').value = meetup.location;
+        document.getElementById('edit-description').value = meetup.description;
+        editStatus.style.display = 'none';
+      });
+      
+      // Save changes
+      saveButton.addEventListener('click', async () => {
+        const title = document.getElementById('edit-title').value.trim();
+        const datetime = document.getElementById('edit-datetime').value;
+        const location = document.getElementById('edit-location').value.trim();
+        const description = document.getElementById('edit-description').value.trim();
+        
+        if (!title || !datetime || !location || !description) {
+          showEditStatus('请填写所有必填字段', 'error');
+          return;
+        }
+        
+        saveButton.disabled = true;
+        saveButton.textContent = '保存中...';
+        
+        try {
+          // 使用统一的时间处理函数创建时间对象
+          const datetimeWithTimezone = TimeUtils.createDateTimeObject(datetime);
+          
+          const response = await fetch('/.netlify/functions/updateMeetup', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              token,
+              title,
+              datetime: datetimeWithTimezone,
+              location,
+              description
+            })
+          });
+          
+          const result = await response.json();
+          
+          if (!response.ok || result.error) {
+            throw new Error(result.error || '更新失败');
+          }
+          
+          // Update meetup object
+          meetup.title = title;
+          meetup.datetime = datetime;
+          meetup.location = location;
+          meetup.description = description;
+          
+          // Update display
+          document.getElementById('display-title').textContent = title;
+          document.getElementById('display-datetime').textContent = formatDateTime(datetime);
+          document.getElementById('display-location').textContent = location;
+          document.getElementById('display-description').textContent = description;
+          
+          // Return to view mode
+          editForm.style.display = 'none';
+          meetupDisplay.style.display = 'block';
+          
+          // Show success message
+          showEditStatus('活动信息更新成功！', 'success');
+          
+          // Hide success message after 3 seconds
+          setTimeout(() => {
+            editStatus.style.display = 'none';
+          }, 3000);
+          
+        } catch (error) {
+          console.error('Update error:', error);
+          showEditStatus(`更新失败：${error.message}`, 'error');
+        } finally {
+          saveButton.disabled = false;
+          saveButton.textContent = '保存修改';
+        }
+      });
+      
+      function showEditStatus(message, type) {
+        editStatus.textContent = message;
+        editStatus.className = `status-message ${type}`;
+        editStatus.style.display = 'block';
+        
+        setTimeout(() => {
+          editStatus.style.display = 'none';
+        }, 5000);
+      }
+    }
+    
+    // Global formatDateTime function
+    function formatDateTime(datetimeStr) {
+      // 使用统一的时间显示函数
+      return TimeUtils.formatDateTimeForDisplay(datetimeStr);
+    }
+
+
   </script>
 </body>
 </html>

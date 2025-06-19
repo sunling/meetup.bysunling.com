@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Meetup 活动列表</title>
+  <title>活动列表</title>
+  <link rel="stylesheet" href="./styles/shared.css">
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
@@ -50,63 +51,168 @@
     }
     .new-meetup-btn {
       display: inline-block;
-      background-color: #5f9b65;
+      background: linear-gradient(135deg, #ff6b9d 0%, #ffa726 50%, #42a5f5 100%);
       color: #fff;
       padding: 0.7em 1.5em;
       border-radius: 6px;
       text-decoration: none;
       margin-bottom: 2em;
       font-weight: 500;
-      transition: background-color 0.3s ease;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
     }
     .new-meetup-btn:hover {
-      background-color: #498e52;
+      background: linear-gradient(135deg, #e55a8a 0%, #f57c00 50%, #1976d2 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
+    }
+    .event-section {
+      margin-bottom: 3em;
+    }
+    .event-section h2 {
+      font-size: 1.5em;
+      margin-bottom: 1em;
+      background: linear-gradient(135deg, #ff6b9d 0%, #ffa726 50%, #42a5f5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      border-image: linear-gradient(135deg, #ff6b9d 0%, #ffa726 50%, #42a5f5 100%) 1;
+      padding-bottom: 0.5em;
+      position: relative;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🎯 Meetup 活动</h1>
+    <!-- <h1 class="title-dopamine">所有活动</h1> -->
     <a class="new-meetup-btn" href="new-meetup.html">➕ 新建活动</a>
 
-    <div id="meetup-list" class="event-list">
-      加载中...
+    <div id="past-events" class="event-section">
+      <h2 class="subtitle-dopamine">📅 过去的活动</h2>
+      <div class="event-list" id="past-list">
+        加载中...
+      </div>
+    </div>
+
+    <div id="today-events" class="event-section">
+      <h2 class="subtitle-dopamine">🔥 今日活动</h2>
+      <div class="event-list" id="today-list">
+        加载中...
+      </div>
+    </div>
+
+    <div id="future-events" class="event-section">
+      <h2 class="subtitle-dopamine">🚀 即将到来</h2>
+      <div class="event-list" id="future-list">
+        加载中...
+      </div>
     </div>
   </div>
 
   <script>
+    function categorizeEventsByTime(meetups) {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+      
+      const past = [];
+      const today_events = [];
+      const future = [];
+      
+      meetups.forEach(meetup => {
+        const eventDate = new Date(meetup.datetime);
+        const eventDay = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+        
+        if (eventDay < today) {
+          past.push(meetup);
+        } else if (eventDay.getTime() === today.getTime()) {
+          today_events.push(meetup);
+        } else {
+          future.push(meetup);
+        }
+      });
+      
+      return { past, today_events, future };
+    }
+    
+    function createEventCard(meetup) {
+      const item = document.createElement('a');
+      item.className = 'event-card';
+      item.href = `meetup.html?meetup_id=${meetup.id}`;
+      const dateText = new Date(meetup.datetime).toLocaleString("zh-CN");
+      const rsvpCount = meetup.rsvp_count || 0;
+      item.innerHTML = `
+        <div class="event-title">${meetup.title}</div>
+        <div class="event-meta">📅 ${dateText} | 📍 ${meetup.location} | 👥 ${rsvpCount}人报名</div>
+        <div>${(meetup.description || '').slice(0, 60)}...</div>
+      `;
+      return item;
+    }
+    
+    function renderEventsByCategory(categorized) {
+      const pastContainer = document.getElementById('past-list');
+      const todayContainer = document.getElementById('today-list');
+      const futureContainer = document.getElementById('future-list');
+      
+      // Clear containers
+      pastContainer.innerHTML = '';
+      todayContainer.innerHTML = '';
+      futureContainer.innerHTML = '';
+      
+      // Render past events (newest first)
+      categorized.past.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+      categorized.past.forEach(meetup => {
+        pastContainer.appendChild(createEventCard(meetup));
+      });
+      
+      // Render today's events (earliest first)
+      categorized.today_events.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+      categorized.today_events.forEach(meetup => {
+        todayContainer.appendChild(createEventCard(meetup));
+      });
+      
+      // Render future events (earliest first)
+      categorized.future.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+      categorized.future.forEach(meetup => {
+        futureContainer.appendChild(createEventCard(meetup));
+      });
+      
+      // Hide sections with no events
+      document.getElementById('past-events').style.display = categorized.past.length > 0 ? 'block' : 'none';
+      document.getElementById('today-events').style.display = categorized.today_events.length > 0 ? 'block' : 'none';
+      document.getElementById('future-events').style.display = categorized.future.length > 0 ? 'block' : 'none';
+    }
+
     async function loadMeetups() {
       try {
         const response = await fetch('/.netlify/functions/listMeetups');
         if (!response.ok) {
-          document.getElementById("meetup-list").innerText = "加载失败，请稍后重试。";
+          document.getElementById("past-list").innerText = "加载失败，请稍后重试。";
+          document.getElementById("today-list").innerText = "加载失败，请稍后重试。";
+          document.getElementById("future-list").innerText = "加载失败，请稍后重试。";
           return;
         }
 
         const meetups = await response.json();
-        const container = document.getElementById('meetup-list');
-        container.innerHTML = '';
-
+        
         if (meetups.length === 0) {
-          container.innerText = "当前暂无活动，快去新建一个吧！";
+          document.getElementById("future-list").innerText = "当前暂无活动，快去新建一个吧！";
+          document.getElementById('past-events').style.display = 'none';
+          document.getElementById('today-events').style.display = 'none';
           return;
         }
 
-        meetups.forEach(meetup => {
-          const item = document.createElement('a');
-          item.className = 'event-card';
-          item.href = `meetup.html?meetup_id=${meetup.id}`;
-          const dateText = new Date(meetup.datetime).toLocaleString("zh-CN");
-          item.innerHTML = `
-            <div class="event-title">${meetup.title}</div>
-            <div class="event-meta">📅 ${dateText} | 📍 ${meetup.location}</div>
-            <div>${(meetup.description || '').slice(0, 60)}...</div>
-          `;
-          container.appendChild(item);
-        });
+        const categorized = categorizeEventsByTime(meetups);
+        renderEventsByCategory(categorized);
+        
       } catch (err) {
         console.error("加载失败:", err);
-        document.getElementById("meetup-list").innerText = "加载失败，请检查网络连接";
+        document.getElementById("past-list").innerText = "加载失败，请检查网络连接";
+        document.getElementById("today-list").innerText = "加载失败，请检查网络连接";
+        document.getElementById("future-list").innerText = "加载失败，请检查网络连接";
       }
     }
 

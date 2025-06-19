@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>活动审核管理</title>
+    <link rel="stylesheet" href="./styles/shared.css">
     <style>
         * {
             margin: 0;
@@ -61,17 +62,21 @@
 
         .auth-form button {
             padding: 12px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff6b9d 0%, #ffa726 50%, #42a5f5 100%);
             color: white;
             border: none;
             border-radius: 10px;
             font-size: 16px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .auth-form button:hover {
+            background: linear-gradient(135deg, #e55a8a 0%, #f57c00 50%, #1976d2 100%);
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
         }
 
         .meetups-section {
@@ -179,12 +184,6 @@
             border: 1px solid #f5c6cb;
         }
 
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-
         .section-header {
             font-size: 1.3rem;
             font-weight: bold;
@@ -200,7 +199,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>活动审核管理</h1>
+            <h1 class="title-dopamine">活动审核管理</h1>
             <p>管理员审核系统</p>
         </div>
 

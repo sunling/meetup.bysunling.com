@@ -2,6 +2,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { randomUUID } from 'crypto'
 import dotenv from 'dotenv'
+import { formatDateTimeForStorage } from '../../scripts/timeUtils.js'
 dotenv.config()
 
 const supabase = createClient(
@@ -19,7 +20,7 @@ export async function handler(event, context) {
 
   try {
     const data = JSON.parse(event.body);
-    const { title, datetime, location, description, wechat, qrcode } = data;
+    const { title, datetime, location, description, wechat, qrcode, duration } = data;
 
     if (!title || !datetime || !location || !description || !wechat) {
       return {
@@ -30,15 +31,19 @@ export async function handler(event, context) {
 
     const manage_token = randomUUID();
 
+    // 使用统一的时间处理函数
+    const datetimeWithTimezone = formatDateTimeForStorage(datetime);
+
     const record = {
       title,
-      datetime,
+      datetime: datetimeWithTimezone,
       location,
       description,
       wechat_id: wechat,
       manage_token,
       qrcode,
-      status: 'approved'
+      status: 'approved',
+      duration,
     };
 
     const { data: inserted, error } = await supabase
