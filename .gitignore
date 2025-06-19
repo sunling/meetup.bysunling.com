@@ -2,5 +2,6 @@
 .netlify
 /node_modules
 .env
+.env.dev
 .env.test
 .DS_Store
