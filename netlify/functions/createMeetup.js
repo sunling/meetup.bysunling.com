@@ -33,6 +33,7 @@ export async function handler(event, context) {
     // 使用统一的时间处理函数
     const datetimeWithTimezone = formatDateTimeForStorage(datetime);
 
+    console.log('--======',datetimeWithTimezone);
 
     const record = {
       title,

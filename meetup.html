@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Meetup 活动详情</title>
+  <title>活动详情</title>
   <link rel="stylesheet" href="./styles/shared.css">
   <style>
     :root {
@@ -16,10 +17,10 @@
       --card-bg: #ffffff;
       --border-color: #e6e6e6;
       --maybe-color: #f0b660;
-      --going-color: #5f9b65;
+      --going-color: #e17a0b;
       --cant-go-color: #aaaaaa;
     }
-    
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", "Arial", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       margin: 0;
@@ -28,28 +29,30 @@
       color: var(--text-color);
       line-height: 1.6;
     }
-    
+
     .container {
       max-width: 1000px;
       margin: 0 auto;
       background-color: #fff;
       border: 1px solid #e0e0e0;
       border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
       overflow: hidden;
     }
-    
+
     /* --- 头部 --- */
     header {
       padding: 30px 40px;
       border-bottom: 1px solid #e0e0e0;
       position: relative;
     }
+
     header h1 {
       font-size: 2.2em;
       margin: 0;
       color: #1a1a1a;
     }
+
     .home-link {
       position: absolute;
       top: 30px;
@@ -62,34 +65,37 @@
       font-size: 0.9em;
       transition: all 0.3s ease;
     }
+
     .home-link:hover {
       background: linear-gradient(135deg, #e55a8a 0%, #f57c00 50%, #1976d2 100%);
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
     }
-    
+
     /* --- 主布局 (左右分栏) --- */
     .main-layout {
       display: flex;
       flex-wrap: wrap;
       padding: 20px 40px;
     }
+
     main {
       flex: 1;
       min-width: 60%;
       padding-right: 40px;
     }
+
     aside {
       flex-basis: 300px;
       flex-shrink: 0;
     }
-    
+
     /* --- 左侧内容区 --- */
-    
+
     .event-meta {
       margin-bottom: 2em;
     }
-    
+
     .event-meta-item {
       display: flex;
       align-items: center;
@@ -97,13 +103,14 @@
       color: var(--light-text);
       font-size: 1em;
     }
-    
-    .event-meta-item svg, .event-meta-item i {
+
+    .event-meta-item svg,
+    .event-meta-item i {
       margin-right: 0.8em;
       width: 20px;
       text-align: center;
     }
-    
+
     .event-description {
       margin-bottom: 2em;
       line-height: 1.8;
@@ -111,7 +118,7 @@
       font-size: 1em;
       color: #555;
     }
-    
+
     /* --- 右侧信息卡片 --- */
     .info-card {
       border: 1px solid #e0e0e0;
@@ -119,30 +126,32 @@
       padding: 20px;
       background-color: #fdfdfd;
     }
+
     .info-card h3 {
       font-size: 1.1em;
       color: #333;
       margin-top: 0;
       margin-bottom: 10px;
     }
+
     .info-card .info-item {
       margin-bottom: 20px;
     }
-    
+
     .rsvp-section {
       margin-top: 1em;
       margin-bottom: 2em;
     }
-    
 
-    
+
+
     .rsvp-buttons {
       display: flex;
       gap: 0.5em;
       flex-wrap: wrap;
       margin-bottom: 1em;
     }
-    
+
     .rsvp-button {
       display: inline-flex;
       align-items: center;
@@ -155,7 +164,7 @@
       transition: all 0.2s ease;
       font-size: 0.95em;
     }
-    
+
     /* --- 按钮样式 --- */
     .btn {
       display: block;
@@ -170,65 +179,44 @@
       margin-bottom: 10px;
       transition: all 0.2s ease;
     }
-    .btn-primary {
-      background: linear-gradient(135deg, #FFB6C1, #FFE4E1, #F0E68C);
-      color: #666;
-    }
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #FF91A4, #FFD1D4, #EDE066);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
-    }
-    .btn-secondary {
-      background: linear-gradient(135deg, rgba(255, 182, 193, 0.3), rgba(255, 228, 225, 0.3), rgba(240, 230, 140, 0.3));
-      color: #666;
-    }
-    .btn-secondary:hover {
-      background: linear-gradient(135deg, rgba(255, 182, 193, 0.5), rgba(255, 228, 225, 0.5), rgba(240, 230, 140, 0.5));
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(255, 182, 193, 0.2);
-    }
-    
+
     .going-button {
       color: #666;
       border-color: #FFB6C1;
       background: linear-gradient(135deg, rgba(255, 182, 193, 0.2), rgba(255, 228, 225, 0.2));
     }
-    
+
     .going-button:hover {
       background: linear-gradient(135deg, rgba(255, 182, 193, 0.3), rgba(255, 228, 225, 0.3));
       transform: translateY(-1px);
       box-shadow: 0 2px 8px rgba(255, 182, 193, 0.3);
     }
-    
+
     .maybe-button {
       color: #666;
       border-color: #F0E68C;
       background: linear-gradient(135deg, rgba(240, 230, 140, 0.2), rgba(255, 228, 225, 0.2));
     }
-    
+
+    #cancel-rsvp-button:hover {
+      background: #eeeeee !important;
+      color: #555 !important;
+      border-color: #ccc !important;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
     .maybe-button:hover {
       background: linear-gradient(135deg, rgba(240, 230, 140, 0.3), rgba(255, 228, 225, 0.3));
       transform: translateY(-1px);
       box-shadow: 0 2px 8px rgba(240, 230, 140, 0.3);
     }
-    
-    .cant-go-button {
-      color: #666;
-      border-color: #DDA0DD;
-      background: linear-gradient(135deg, rgba(221, 160, 221, 0.2), rgba(224, 255, 255, 0.2));
-    }
-    
-    .cant-go-button:hover {
-      background: linear-gradient(135deg, rgba(221, 160, 221, 0.3), rgba(224, 255, 255, 0.3));
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(221, 160, 221, 0.3);
-    }
-    
-    .rsvp-button svg, .rsvp-button i {
+
+    .rsvp-button svg,
+    .rsvp-button i {
       margin-right: 0.5em;
     }
-    
+
     .action-button {
       display: inline-block;
       background: linear-gradient(135deg, #ff6b9d 0%, #ffa726 50%, #42a5f5 100%);
@@ -243,19 +231,18 @@
       position: relative;
       overflow: hidden;
     }
-    
+
     .action-button:hover {
       background: linear-gradient(135deg, #e55a8a 0%, #f57c00 50%, #1976d2 100%);
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
     }
-    
+
     /* --- 参与者头像 --- */
     .attendee-avatars {
-      display: flex;
-      flex-wrap: wrap;
       margin-bottom: 1em;
     }
+
     .attendee-avatars .avatar {
       width: 40px;
       height: 40px;
@@ -271,7 +258,7 @@
       font-weight: bold;
       font-size: 0.8em;
     }
-    
+
     li {
       margin-bottom: 0.8em;
       padding: 0.6em 1em;
@@ -281,32 +268,15 @@
       justify-content: space-between;
       align-items: center;
     }
-    
-    li.is-yours {
-      background: rgba(95, 155, 101, 0.05);
-      border-left: 3px solid var(--primary-color);
+
+    .success {
+      color: var(--going-color);
     }
-    
-    .cancel-btn {
+
+    .error {
       color: #e74c3c;
-      cursor: pointer;
-      font-size: 0.9em;
-      opacity: 0.7;
-      transition: opacity 0.2s ease;
     }
-    
-    .cancel-btn:hover {
-      opacity: 1;
-    }
-    
-    .success { 
-      color: var(--going-color); 
-    }
-    
-    .error { 
-      color: #e74c3c; 
-    }
-    
+
     /* Dialog Styles */
     .dialog-overlay {
       position: fixed;
@@ -323,13 +293,13 @@
       opacity: 0;
       transition: visibility 0s linear 0.25s, opacity 0.25s;
     }
-    
+
     .dialog-overlay.visible {
       visibility: visible;
       opacity: 1;
       transition-delay: 0s;
     }
-    
+
     .dialog {
       background-color: white;
       width: 90%;
@@ -338,38 +308,43 @@
       overflow: hidden;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     }
-    
+
     .dialog-header {
       background-color: #f5f5f5;
       padding: 1em 1.5em;
       border-bottom: 1px solid var(--border-color);
     }
-    
+
     .dialog-title {
       margin: 0;
       font-size: 1.2em;
       color: var(--text-color);
     }
-    
+
     .dialog-body {
       padding: 1.5em;
     }
-    
+
     .dialog-footer {
       padding: 1em 1.5em;
       display: flex;
       justify-content: flex-end;
-      gap: 1em;
+      gap: 0.8em;
       border-top: 1px solid var(--border-color);
     }
-    
+
+    .dialog-footer .action-button {
+      margin-top: 0;
+      min-width: 80px;
+    }
+
     .dialog-form label {
       display: block;
       margin-bottom: 0.5em;
       font-weight: 500;
       color: var(--light-text);
     }
-    
+
     .dialog-form input {
       margin-bottom: 1.2em;
       padding: 0.8em;
@@ -379,47 +354,56 @@
       border-radius: 4px;
       box-sizing: border-box;
     }
-    
+
     .dialog-form input:focus {
       outline: none;
       border-color: var(--primary-light);
       box-shadow: 0 0 0 2px rgba(95, 155, 101, 0.2);
     }
-    
+
     .dialog-message {
       margin-top: 1em;
       padding: 0.5em 0;
     }
-    
+
     .share-section {
       margin-top: 2em;
     }
-    
+
     #share-message {
       margin-top: 0.5em;
       height: 1.5em;
       font-size: 0.9em;
     }
-    
+
     .cancel-button {
-      background-color: #f5f5f5;
-      color: var(--light-text);
-      border: 1px solid #ddd;
+      background: #f8f9fa !important;
+      color: #6c757d !important;
+      border: 1px solid #dee2e6 !important;
+      font-weight: 400;
     }
-    
+
     .cancel-button:hover {
-      background-color: #eeeeee;
+      background: #e9ecef !important;
+      color: #495057 !important;
+      border-color: #adb5bd !important;
+      transform: none !important;
+      box-shadow: none !important;
     }
-    
+
     .submit-button {
-      background-color: var(--primary-color);
+      background: linear-gradient(135deg, #ff6b9d 0%, #ffa726 50%, #42a5f5 100%);
       color: white;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(255, 107, 157, 0.3);
     }
-    
+
     .submit-button:hover {
-      background-color: var(--primary-light);
+      background: linear-gradient(135deg, #e55a8a 0%, #f57c00 50%, #1976d2 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
     }
-    
+
     .rsvp-status {
       margin-top: 1em;
       padding: 0.8em;
@@ -427,13 +411,16 @@
       font-weight: 500;
       display: none;
     }
-    
+
     .rsvp-status.success {
-      background-color: rgba(95, 155, 101, 0.1);
+      background-color: transparent;
       color: var(--going-color);
       display: block;
+      /* border-left: 3px solid var(--going-color); */
+      padding-left: 1em;
+      font-style: italic;
     }
-    
+
     .badge {
       display: inline-block;
       font-size: 0.8em;
@@ -441,12 +428,12 @@
       border-radius: 3px;
       margin-left: 0.5em;
     }
-    
+
     .badge-you {
       background-color: rgba(95, 155, 101, 0.1);
       color: var(--going-color);
     }
-    
+
     .qr-code-section {
       margin-top: 2em;
       padding: 1.5em;
@@ -456,19 +443,19 @@
       text-align: center;
       display: none;
     }
-    
+
     .qr-code-section h3 {
       margin-bottom: 1em;
       color: var(--text-color);
       font-size: 1.2em;
     }
-    
+
     .qr-code-section p {
       margin-bottom: 1em;
       color: var(--light-text);
       line-height: 1.6;
     }
-    
+
     .qr-code-image {
       max-width: 200px;
       width: 100%;
@@ -476,48 +463,52 @@
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
-    
+
     @media (max-width: 768px) {
       body {
         padding: 10px;
       }
-      
+
       .main-layout {
         flex-direction: column;
       }
+
       main {
         padding-right: 0;
         padding-bottom: 20px;
       }
-      header, .main-layout {
+
+      header,
+      .main-layout {
         padding: 20px;
       }
-      
+
       header h1 {
         font-size: 1.8em;
       }
-      
+
       .rsvp-buttons {
         flex-direction: column;
       }
-      
+
       .rsvp-button {
         width: 100%;
       }
-      
+
       .attendee-avatars .avatar {
         margin-right: -5px;
       }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <header>
       <h1 id="meetup-title" class="title-dopamine">活动详情</h1>
-      <a href="index.html" class="home-link">🏠 回到首页</a>
+      <a href="index.html" class="home-link">回到首页</a>
     </header>
-    
+
     <div class="main-layout">
       <main>
         <article>
@@ -526,7 +517,7 @@
           </div>
         </article>
       </main>
-      
+
       <aside>
         <div class="info-card">
           <div class="info-item">
@@ -535,29 +526,29 @@
               <p>正在加载...</p>
             </div>
           </div>
-          
+
           <div class="rsvp-section" id="rsvp-section" style="display:none">
-            <div id="rsvp-status" class="rsvp-status"></div>
-            
             <button class="btn btn-primary" id="going-button" style="display:none">
               ✓ 确定参加
             </button>
-            
+
             <button class="btn btn-secondary" id="maybe-button" style="display:none">
               ? 感兴趣
             </button>
-            
+
             <div class="rsvp-buttons" id="rsvp-buttons">
               <div class="rsvp-button going-button" id="going-button-small">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                   <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
                 确定参加
               </div>
-              
+
               <div class="rsvp-button maybe-button" id="maybe-button-small">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="10"></circle>
                   <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
                   <line x1="12" y1="17" x2="12.01" y2="17"></line>
@@ -565,14 +556,15 @@
                 感兴趣
               </div>
             </div>
-            
-            <button class="btn btn-secondary" id="cancel-rsvp-button" style="display:none">
+
+            <button class="btn btn-secondary" id="cancel-rsvp-button" style="display:none; background: #f5f5f5 !important; color: #666 !important; border: 1px solid #ddd !important;">
               取消我的报名
             </button>
           </div>
-          
+
           <div class="info-item attendees" id="attendees-section" style="display:none">
             <h3 id="attendees-title">已有 0 位朋友报名</h3>
+            <div id="rsvp-status" class="rsvp-status"></div>
             <div class="attendee-avatars" id="attendee-avatars">
               <!-- Attendee avatars will be populated by JavaScript -->
             </div>
@@ -580,21 +572,25 @@
         </div>
       </aside>
     </div>
-    
+
     <!-- QR Code Section -->
     <div class="qr-code-section" id="qr-code-section">
       <h3>🎉 报名成功！</h3>
       <p>扫描下方二维码加入活动微信群，获取最新活动信息和与其他参与者交流：</p>
       <img src="https://via.placeholder.com/200x200/FFB6C1/666666?text=微信群二维码" alt="微信群二维码" class="qr-code-image">
-      <p style="font-size: 0.9em; margin-top: 1em;">如果二维码过期，请联系活动组织者</p>
+      <p style="font-size: 0.9em; margin-top: 1em;">如果二维码过期，请联系活动组织者（微信号：<span id="organizer-contact"
+          style="font-size: 0.9em; margin-top: 0.5em; color: #666;"></spa></p>
     </div>
-    
+
     <div class="share-section" style="padding: 20px 40px; border-top: 1px solid #e0e0e0;">
-      <button id="share-button" class="btn btn-secondary" style="max-width: 300px; margin: 0 auto;">📤 复制活动链接</button>
+      <button id="share-button" class="btn btn-secondary" style="max-width: 300px; margin: 0 auto;">复制活动链接</button>
       <p id="share-message" style="text-align: center; margin-top: 0.5em; height: 1.5em; font-size: 0.9em;"></p>
     </div>
   </div>
-  
+
+  <!-- 悬浮新建活动按钮 -->
+  <a href="new-meetup.html" class="floating-new-meetup" title="新建活动">+</a>
+
   <!-- RSVP Dialog -->
   <div class="dialog-overlay" id="rsvp-dialog">
     <div class="dialog">
@@ -604,13 +600,13 @@
       <div class="dialog-body">
         <form class="dialog-form" id="rsvp-form">
           <input type="hidden" id="status" value="going">
-          
-          <label for="name">你的昵称</label>
+
+          <label for="name">你的昵称 <span style="color: red;">*</span></label>
           <input type="text" id="name" required placeholder="请输入你的昵称" />
-          
-          <label for="wechat">你的微信号</label>
+
+          <label for="wechat">你的微信号 <span id="wechat-required" style="color: red;">*</span></label>
           <input type="text" id="wechat" required placeholder="请输入你的微信号" />
-          
+
           <div class="dialog-message" id="rsvp-message"></div>
         </form>
       </div>
@@ -620,7 +616,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Confirm Dialog -->
   <div class="dialog-overlay" id="confirm-dialog">
     <div class="dialog">
@@ -644,53 +640,67 @@
     const confirmDialog = document.getElementById('confirm-dialog');
     const statusInput = document.getElementById('status');
     const dialogTitle = document.getElementById('dialog-title');
-    
+    const qrCodeSection = document.getElementById('qr-code-section');
+
     // User data storage key format: `meetup-{meetup_id}-user`
     function getUserStorageKey() {
       return `meetup-${meetup_id}-user`;
     }
-    
+
     // Save user data to localStorage
     function saveUserData(name, wechat) {
       const userData = { name, wechat };
       localStorage.setItem(getUserStorageKey(), JSON.stringify(userData));
     }
-    
+
     // Get user data from localStorage
     function getUserData() {
       const data = localStorage.getItem(getUserStorageKey());
       return data ? JSON.parse(data) : null;
     }
-    
+
     // Remove user data from localStorage
     function removeUserData() {
       localStorage.removeItem(getUserStorageKey());
     }
-    
+
     // Check if an RSVP belongs to the current user
     function isCurrentUserRsvp(item) {
       const userData = getUserData();
       if (!userData) return false;
-      
+
       return item.name === userData.name && item.wechat_id === userData.wechat;
     }
-    
+
     // Get current user's RSVP if exists
     function getCurrentUserRsvp() {
       const userData = getUserData();
       if (!userData) return null;
-      
-      return allRsvps.find(item => 
+
+      return allRsvps.find(item =>
         item.name === userData.name && item.wechat_id === userData.wechat
       );
     }
-    
+
     // Open dialog with specified status
     function openRsvpDialog(status) {
       statusInput.value = status;
       dialogTitle.textContent = status === 'going' ? '确定参加' : '感兴趣';
       document.getElementById('rsvp-message').textContent = '';
-      
+
+      // Set wechat field requirement based on status
+      const wechatInput = document.getElementById('wechat');
+      const wechatRequired = document.getElementById('wechat-required');
+      if (status === 'maybe') {
+        wechatInput.removeAttribute('required');
+        wechatInput.placeholder = '请输入你的微信号（选填）';
+        wechatRequired.style.display = 'none';
+      } else {
+        wechatInput.setAttribute('required', 'required');
+        wechatInput.placeholder = '请输入你的微信号';
+        wechatRequired.style.display = 'inline';
+      }
+
       // Pre-fill with user data if available
       const userData = getUserData();
       if (userData) {
@@ -699,25 +709,25 @@
       } else {
         document.getElementById('rsvp-form').reset();
       }
-      
+
       dialog.classList.add('visible');
     }
-    
+
     // Close dialog
     function closeRsvpDialog() {
       dialog.classList.remove('visible');
     }
-    
+
     // Open confirm dialog
     function openConfirmDialog() {
       confirmDialog.classList.add('visible');
     }
-    
+
     // Close confirm dialog
     function closeConfirmDialog() {
       confirmDialog.classList.remove('visible');
     }
-    
+
     // Update the RSVP UI based on user's status
     function updateRsvpUI() {
       const userRsvp = getCurrentUserRsvp();
@@ -726,51 +736,53 @@
       const rsvpButtons = document.getElementById('rsvp-buttons');
       const goingButton = document.getElementById('going-button');
       const maybeButton = document.getElementById('maybe-button');
-      
+
       if (userRsvp) {
         // User has an RSVP
-        rsvpStatus.innerHTML = userRsvp.status === 'going' ? 
-          '✅ 你已确定参加此活动' : 
-          '🤔 你已表示对此活动感兴趣';
+        rsvpStatus.innerHTML = userRsvp.status === 'going' ?
+          '你已确定参加此活动' :
+          '你已表示对此活动感兴趣';
         rsvpStatus.className = 'rsvp-status success';
-        
+
         // Show appropriate status button
         if (userRsvp.status === 'going') {
-          goingButton.style.display = 'block';
+          goingButton.style.display = 'none';
           maybeButton.style.display = 'none';
         } else {
-          goingButton.style.display = 'none';
-          maybeButton.style.display = 'block';
+          goingButton.style.display = 'block';
+          maybeButton.style.display = 'none';
         }
-        
+
+        // Update cancel button text based on status
+        cancelButton.textContent = userRsvp.status === 'going' ? '取消我的报名' : '取消感兴趣';
         cancelButton.style.display = 'block';
         rsvpButtons.style.display = 'none';
-        
-        // Show QR code section when user has RSVP
+
+        // Show QR code section only when user is going
         if (qrCodeSection) {
-          qrCodeSection.style.display = 'block';
+          qrCodeSection.style.display = userRsvp.status === 'going' ? 'block' : 'none';
         }
       } else {
         // User has no RSVP
         rsvpStatus.textContent = '';
         rsvpStatus.className = 'rsvp-status';
-        
+
         goingButton.style.display = 'none';
         maybeButton.style.display = 'none';
         cancelButton.style.display = 'none';
         rsvpButtons.style.display = 'flex';
-        
+
         // Hide QR code section when user has no RSVP
         if (qrCodeSection) {
           qrCodeSection.style.display = 'none';
         }
       }
     }
-    
+
     async function loadMeetupData() {
       meetup_id = new URLSearchParams(window.location.search).get("meetup_id");
       if (!meetup_id) {
-        document.getElementById("meetup-info").innerHTML = "❌ 缺少 meetup_id 参数。";
+        document.getElementById("meetup-info").innerHTML = "缺少 meetup_id 参数。";
         return;
       }
       try {
@@ -780,9 +792,9 @@
 
         const { meetup, rsvps } = result;
         allRsvps = rsvps || [];
-        
+
         document.getElementById("meetup-title").textContent = meetup.title;
-        
+
         // Update QR code image if available
         if (meetup.qrcode) {
           const qrCodeImg = document.querySelector('.qr-code-image');
@@ -790,29 +802,37 @@
             qrCodeImg.src = meetup.qrcode;
           }
         }
+
+        // Update organizer contact if available
+        if (meetup.wechat_id) {
+          const organizerContact = document.getElementById('organizer-contact');
+          if (organizerContact) {
+            organizerContact.textContent = `${meetup.wechat_id}）`;
+          }
+        }
         // Format datetime in user's local timezone
         const formatDateTime = (datetimeStr) => {
           const date = new Date(datetimeStr);
-          
+
           // 获取本地时间格式
           const localDateString = date.toLocaleDateString('zh-CN', {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit'
           });
-          
+
           const localTimeString = date.toLocaleTimeString('zh-CN', {
             hour: '2-digit',
             minute: '2-digit',
             hour12: false
           });
-          
+
           return `${localDateString} ${localTimeString}`;
         };
-        
+
         // 更新活动描述
         document.getElementById("meetup-description").innerHTML = meetup.description;
-        
+
         // 更新活动元信息
         document.getElementById("meetup-meta").innerHTML = `
           <div class="event-meta-item">
@@ -830,12 +850,22 @@
           </div>
           ` : ''}
         `;
-        
+
         document.getElementById("rsvp-section").style.display = 'block';
         updateRsvpUI();
         renderRsvpList();
+
+        // 检查URL参数，如果有action参数则自动打开对应的对话框
+        const urlParams = new URLSearchParams(window.location.search);
+        const action = urlParams.get('action');
+        if (action === 'going' || action === 'maybe') {
+          // 延迟一点时间确保UI已经更新完成
+          setTimeout(() => {
+            openRsvpDialog(action);
+          }, 500);
+        }
       } catch (err) {
-        document.getElementById("meetup-info").innerHTML = `❌ 加载失败：${err.message}`;
+        document.getElementById("meetup-info").innerHTML = `加载失败：${err.message}`;
       }
     }
 
@@ -843,82 +873,177 @@
       const attendeesSection = document.getElementById('attendees-section');
       const attendeesTitle = document.getElementById('attendees-title');
       const avatarsContainer = document.getElementById('attendee-avatars');
-      
+
       if (allRsvps.length === 0) {
         attendeesSection.style.display = 'none';
         return;
       }
-      
+
       // Group RSVPs by status
       const going = allRsvps.filter(item => item.status === 'going');
       const maybe = allRsvps.filter(item => item.status === 'maybe');
-      
+
       const totalCount = going.length + maybe.length;
-      attendeesTitle.textContent = `已有 ${totalCount} 位朋友报名`;
-      
+      attendeesTitle.textContent = `参与者 (${totalCount})`;
+
+      // Generate random gradient colors for going (darker)
+      function getGoingGradient() {
+        const colors = [
+          ['#e91e63', '#ff5722'], // Deep Pink to Deep Orange
+          ['#8bc34a', '#2196f3'], // Deep Green to Deep Blue
+          ['#4caf50', '#ff9800'], // Deep Green to Deep Orange
+          ['#9c27b0', '#3f51b5'], // Deep Purple to Deep Indigo
+          ['#f44336', '#e91e63'], // Deep Red to Deep Pink
+          ['#2196f3', '#00bcd4'], // Deep Blue to Deep Cyan
+          ['#ff5722', '#795548'], // Deep Orange to Brown
+          ['#e91e63', '#9c27b0'], // Deep Pink to Deep Purple
+          ['#009688', '#4caf50'], // Deep Teal to Deep Green
+          ['#673ab7', '#3f51b5']  // Deep Purple to Deep Blue
+        ];
+        const randomIndex = Math.floor(Math.random() * colors.length);
+        const [color1, color2] = colors[randomIndex];
+        return `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
+      }
+
+      // Generate random gradient colors for maybe (lighter)
+      function getMaybeGradient() {
+        const colors = [
+          ['#ffcdd2', '#ffe0b2'], // Light Pink to Light Orange
+          ['#f1f8e9', '#e3f2fd'], // Light Green to Light Blue
+          ['#e8f5e8', '#fff3e0'], // Light Mint to Light Peach
+          ['#f3e5f5', '#e8eaf6'], // Light Pink to Light Purple
+          ['#fce4ec', '#f3e5f5'], // Light Pink to Light Lavender
+          ['#e1f5fe', '#e0f2f1'], // Light Blue to Light Cyan
+          ['#fff8e1', '#ffecb3'], // Light Cream to Light Yellow
+          ['#ffebee', '#fce4ec'], // Light Pink to Light Rose
+          ['#e0f2f1', '#fce4ec'], // Light Teal to Light Pink
+          ['#ede7f6', '#f9fbe7']  // Light Purple to Light Yellow
+        ];
+        const randomIndex = Math.floor(Math.random() * colors.length);
+        const [color1, color2] = colors[randomIndex];
+        return `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
+      }
+
       // Clear avatars container
       avatarsContainer.innerHTML = '';
-      
-      // Add going avatars
-      going.forEach(item => {
-        const avatar = document.createElement('div');
-        avatar.className = 'avatar';
-        avatar.textContent = item.name.charAt(0).toUpperCase();
-        avatar.title = `${item.name} - 确定参加`;
-        avatar.style.background = 'linear-gradient(135deg, #5f9b65, #7ab17f)';
-        avatar.style.color = 'white';
-        avatarsContainer.appendChild(avatar);
-      });
-      
-      // Add maybe avatars
-      maybe.forEach(item => {
-        const avatar = document.createElement('div');
-        avatar.className = 'avatar';
-        avatar.textContent = item.name.charAt(0).toUpperCase();
-        avatar.title = `${item.name} - 感兴趣`;
-        avatar.style.background = 'linear-gradient(135deg, #f0b660, #f4c674)';
-        avatar.style.color = 'white';
-        avatarsContainer.appendChild(avatar);
-      });
-      
+
+      // Add going avatars row with title
+      if (going.length > 0) {
+        const goingTitle = document.createElement('div');
+        goingTitle.textContent = `确定参加 (${going.length})`;
+        goingTitle.style.fontSize = '14px';
+        goingTitle.style.fontWeight = 'bold';
+        goingTitle.style.color = '#FFB6C1';
+        goingTitle.style.marginBottom = '8px';
+        avatarsContainer.appendChild(goingTitle);
+
+        const goingRow = document.createElement('div');
+        goingRow.style.display = 'flex';
+        goingRow.style.flexWrap = 'wrap';
+        goingRow.style.marginBottom = '15px';
+
+        going.forEach(item => {
+          const avatar = document.createElement('div');
+          avatar.className = 'avatar';
+          avatar.textContent = item.name.charAt(0).toUpperCase();
+          avatar.title = `${item.name} - 确定参加`;
+          avatar.style.background = getGoingGradient();
+          avatar.style.color = "white";
+          
+          // Highlight current user's avatar
+          if (isCurrentUserRsvp(item)) {
+            avatar.style.width = '50px';
+            avatar.style.height = '50px';
+            avatar.style.border = '3px solid #FFD700';
+            avatar.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
+            avatar.style.fontSize = '1em';
+            avatar.style.zIndex = '10';
+            avatar.style.position = 'relative';
+          }
+          
+          goingRow.appendChild(avatar);
+        });
+
+        avatarsContainer.appendChild(goingRow);
+      }
+
+      // Add maybe avatars row with title
+      if (maybe.length > 0) {
+        const maybeTitle = document.createElement('div');
+        maybeTitle.textContent = `感兴趣 (${maybe.length})`;
+        maybeTitle.style.fontSize = '14px';
+        maybeTitle.style.fontWeight = 'bold';
+        maybeTitle.style.color = '#F0E68C';
+        maybeTitle.style.marginBottom = '8px';
+        avatarsContainer.appendChild(maybeTitle);
+
+        const maybeRow = document.createElement('div');
+        maybeRow.style.display = 'flex';
+        maybeRow.style.flexWrap = 'wrap';
+        maybeRow.style.marginBottom = '15px';
+
+        maybe.forEach(item => {
+          const avatar = document.createElement('div');
+          avatar.className = 'avatar';
+          avatar.textContent = item.name.charAt(0).toUpperCase();
+          avatar.title = `${item.name} - 感兴趣`;
+          avatar.style.background = getMaybeGradient();
+          avatar.style.color = '#333';
+          
+          // Highlight current user's avatar
+          if (isCurrentUserRsvp(item)) {
+            avatar.style.width = '50px';
+            avatar.style.height = '50px';
+            avatar.style.border = '3px solid #FFD700';
+            avatar.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
+            avatar.style.fontSize = '1em';
+            avatar.style.zIndex = '10';
+            avatar.style.position = 'relative';
+          }
+          
+          maybeRow.appendChild(avatar);
+        });
+
+        avatarsContainer.appendChild(maybeRow);
+      }
+
       attendeesSection.style.display = 'block';
     }
-    
 
-    
+
+
     async function cancelRsvp() {
       const userData = getUserData();
       if (!userData) return;
-      
+
       try {
         const res = await fetch('/.netlify/functions/deleteRsvp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            meetup_id, 
-            name: userData.name, 
-            wechat_id: userData.wechat 
+          body: JSON.stringify({
+            meetup_id,
+            name: userData.name,
+            wechat_id: userData.wechat
           })
         });
-        
+
         if (res.ok) {
           // Remove user data from localStorage
           removeUserData();
-          
+
           // Remove user from RSVP list
-          allRsvps = allRsvps.filter(x => 
+          allRsvps = allRsvps.filter(x =>
             x.name !== userData.name || x.wechat_id !== userData.wechat
           );
-          
+
           // Update UI
           updateRsvpUI();
           renderRsvpList();
-          
+
           // Close dialog
           closeConfirmDialog();
-          
+
           // Hide QR code section
-          const qrCodeSection = document.getElementById('qr-code-section');
           if (qrCodeSection) {
             qrCodeSection.style.display = 'none';
           }
@@ -937,9 +1062,22 @@
       const wechat = document.getElementById("wechat").value.trim();
       const status = document.getElementById("status").value;
       const message = document.getElementById("rsvp-message");
-      
-      if (!name || !wechat || !status || !meetup_id) {
-        message.textContent = "❌ 请填写所有必填字段";
+
+      // Check required fields and focus on the first empty one
+      if (!name) {
+        document.getElementById("name").focus();
+        return;
+      }
+
+      // Check wechat only if it's required (for 'going' status)
+      const wechatInput = document.getElementById("wechat");
+      if (status === 'going' && !wechat) {
+        wechatInput.focus();
+        return;
+      }
+
+      if (!status || !meetup_id) {
+        message.textContent = "系统错误，请重试";
         message.className = "error";
         return;
       }
@@ -950,21 +1088,21 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ meetup_id, name, wechat_id: wechat, status }),
         });
-        
+
         const result = await response.json();
-        
+
         if (response.ok) {
           // Save user data to localStorage
           saveUserData(name, wechat);
-          
-          message.textContent = "✅ 报名成功！";
+
+          message.textContent = status === 'going' ? "报名成功！" : "已表示感兴趣！";
           message.className = "success";
-          
+
           // Add user to RSVP list if not already there
-          const existingIndex = allRsvps.findIndex(x => 
+          const existingIndex = allRsvps.findIndex(x =>
             x.name === name && x.wechat_id === wechat
           );
-          
+
           if (existingIndex >= 0) {
             // Update existing RSVP
             allRsvps[existingIndex].status = status;
@@ -972,19 +1110,19 @@
             // Add new RSVP
             allRsvps.push({ name, wechat_id: wechat, status });
           }
-          
+
           // Update UI
           updateRsvpUI();
           renderRsvpList();
-          
+
           // Close dialog after a short delay
           setTimeout(closeRsvpDialog, 1500);
         } else {
-          message.textContent = `❌ 报名失败：${result.error || '未知错误'}`;
+          message.textContent = `报名失败：${result.error || '未知错误'}`;
           message.className = "error";
         }
       } catch (err) {
-        message.textContent = `❌ 提交失败：${err.message}`;
+        message.textContent = `提交失败：${err.message}`;
         message.className = "error";
       }
     }
@@ -993,42 +1131,42 @@
     document.getElementById("going-button-small").addEventListener("click", () => {
       openRsvpDialog('going');
     });
-    
+
     document.getElementById("maybe-button-small").addEventListener("click", () => {
       openRsvpDialog('maybe');
     });
-    
+
     document.getElementById("going-button").addEventListener("click", () => {
       openRsvpDialog('going');
     });
-    
+
     document.getElementById("maybe-button").addEventListener("click", () => {
       openRsvpDialog('maybe');
     });
-    
+
     document.getElementById("cancel-rsvp-button").addEventListener("click", () => {
       openConfirmDialog();
     });
-    
+
     document.getElementById("dialog-cancel").addEventListener("click", closeRsvpDialog);
-    
+
     document.getElementById("dialog-submit").addEventListener("click", submitRsvp);
-    
+
     document.getElementById("confirm-cancel").addEventListener("click", closeConfirmDialog);
-    
+
     document.getElementById("confirm-ok").addEventListener("click", cancelRsvp);
-    
+
     document.getElementById("share-button").addEventListener("click", async () => {
       try {
         await navigator.clipboard.writeText(window.location.href);
-        document.getElementById("share-message").textContent = "✅ 链接已复制！";
-        
+        document.getElementById("share-message").textContent = "链接已复制！";
+
         // Clear message after a delay
         setTimeout(() => {
           document.getElementById("share-message").textContent = "";
         }, 3000);
       } catch {
-        document.getElementById("share-message").textContent = "❌ 复制失败，请手动复制地址栏。";
+        document.getElementById("share-message").textContent = "复制失败，请手动复制地址栏。";
       }
     });
 
@@ -1038,7 +1176,7 @@
         closeRsvpDialog();
       }
     });
-    
+
     confirmDialog.addEventListener("click", (e) => {
       if (e.target === confirmDialog) {
         closeConfirmDialog();
@@ -1049,4 +1187,5 @@
     loadMeetupData();
   </script>
 </body>
+
 </html>

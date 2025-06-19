@@ -47,7 +47,7 @@ export async function handler(event, context) {
     if (!meetup && resolvedMeetupId) {
       const { data, error } = await supabase
         .from('meetups')
-        .select('id, title, datetime, location, description, duration, status, qrcode')
+        .select('id, title, datetime, location, description, duration, status, qrcode,wechat_id')
         .eq('id', resolvedMeetupId)
         .or('status.eq.approved,status.is.null')
         .maybeSingle();

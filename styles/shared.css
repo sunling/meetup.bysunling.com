@@ -45,6 +45,39 @@
   --transition-slow: 0.5s ease;
 }
 
+/* 悬浮新建活动按钮 */
+.floating-new-meetup {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #ff6b9d 0%, #ffa726 50%, #42a5f5 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  box-shadow: 0 4px 20px rgba(255, 107, 157, 0.4);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  border: none;
+  cursor: pointer;
+}
+
+.floating-new-meetup:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255, 107, 157, 0.6);
+  background: linear-gradient(135deg, #e55a8a 0%, #f57c00 50%, #1976d2 100%);
+}
+
+.floating-new-meetup:active {
+  transform: scale(0.95);
+}
+
 /* 全局样式重置 */
 * {
   box-sizing: border-box;
@@ -509,3 +542,5 @@ h3 {
 .hover-lift:hover {
   transform: translateY(-4px);
 }
+.avatar-going { background: linear-gradient(135deg, #5f9b65, #7ab17f); }
+.avatar-maybe { background: linear-gradient(135deg, #f39c12, #e67e22); }

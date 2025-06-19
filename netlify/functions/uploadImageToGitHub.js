@@ -46,6 +46,7 @@ exports.handler = async (event, context) => {
     const GITHUB_REPO_OWNER = process.env.GITHUB_REPO_OWNER;
     const GITHUB_REPO_NAME = process.env.GITHUB_REPO_NAME;
     const GITHUB_BRANCH = process.env.GITHUB_BRANCH;
+
     // Validate environment variables
     if (!GITHUB_TOKEN || !GITHUB_REPO_OWNER || !GITHUB_REPO_NAME || !GITHUB_BRANCH) {
       console.error('Missing GitHub environment variables');

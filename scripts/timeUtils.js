@@ -1,16 +1,13 @@
-// 时间处理工具函数
-
 /**
- * 将用户输入的本地时间转换为带时区信息的时间戳
+ * 将用户输入的本地时间转换为UTC时间戳用于数据库存储
  * @param {Object|string} datetime - 时间对象或字符串
  * @param {string} datetime.localTime - 本地时间字符串 (YYYY-MM-DDTHH:mm)
  * @param {string} datetime.timezone - 时区信息
- * @returns {string} 带时区信息的时间戳字符串
+ * @returns {string} UTC时间戳字符串 (ISO格式)
  */
 function formatDateTimeForStorage(datetime) {
   if (typeof datetime === 'object' && datetime.localTime && datetime.timezone) {
-    // 新格式: { localTime: "2025-06-19T13:28", timezone: "Asia/Shanghai" }
-    // 保持用户的本地时间并添加时区信息
+    // 将用户的本地时间转换为UTC时间
     const localTime = datetime.localTime + ':00'; // 添加秒数
     
     // 创建日期对象来获取用户时区的偏移量
@@ -21,10 +18,14 @@ function formatDateTimeForStorage(datetime) {
     const offsetSign = userTimezoneOffset >= 0 ? '+' : '-';
     const offsetString = `${offsetSign}${offsetHours.toString().padStart(2, '0')}:${offsetMinutes.toString().padStart(2, '0')}`;
     
-    // 格式: 2025-06-19T13:28:00+08:00 (保持用户的本地时间)
-    return localTime + offsetString;
+    // 先创建带时区的时间字符串，然后转换为UTC
+    const timeWithTimezone = localTime + offsetString;
+    const utcDate = new Date(timeWithTimezone);
+    
+    // 返回UTC时间的ISO字符串格式
+    return utcDate.toISOString();
   } else {
-    // 旧格式的回退处理: 当作本地时间处理
+    // 旧格式的回退处理: 当作本地时间处理，转换为UTC
     return new Date(datetime).toISOString();
   }
 }
