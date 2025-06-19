@@ -349,6 +349,36 @@
       color: var(--going-color);
     }
     
+    .qr-code-section {
+      margin-top: 2em;
+      padding: 1.5em;
+      background: linear-gradient(135deg, rgba(255, 182, 193, 0.1), rgba(255, 228, 225, 0.1));
+      border-radius: 12px;
+      border: 1px solid rgba(255, 182, 193, 0.3);
+      text-align: center;
+      display: none;
+    }
+    
+    .qr-code-section h3 {
+      margin-bottom: 1em;
+      color: var(--text-color);
+      font-size: 1.2em;
+    }
+    
+    .qr-code-section p {
+      margin-bottom: 1em;
+      color: var(--light-text);
+      line-height: 1.6;
+    }
+    
+    .qr-code-image {
+      max-width: 200px;
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
     @media (max-width: 768px) {
       .container {
         padding: 1em;
@@ -405,6 +435,14 @@
       <div class="action-button" id="cancel-rsvp-button" style="display:none; background-color: #f5f5f5; color: #666; border: 1px solid #ddd;">
         取消我的报名
       </div>
+    </div>
+    
+    <!-- QR Code Section -->
+    <div class="qr-code-section" id="qr-code-section">
+      <h3>🎉 报名成功！</h3>
+      <p>扫描下方二维码加入活动微信群，获取最新活动信息和与其他参与者交流：</p>
+      <img src="https://via.placeholder.com/200x200/FFB6C1/666666?text=微信群二维码" alt="微信群二维码" class="qr-code-image">
+      <p style="font-size: 0.9em; margin-top: 1em;">如果二维码过期，请联系活动组织者</p>
     </div>
     
     <div class="share-section">
@@ -547,16 +585,22 @@
       const rsvpStatus = document.getElementById('rsvp-status');
       const cancelButton = document.getElementById('cancel-rsvp-button');
       const rsvpButtons = document.getElementById('rsvp-buttons');
+      const qrCodeSection = document.getElementById('qr-code-section');
       
       if (userRsvp) {
         // User has an RSVP
-        rsvpStatus.textContent = userRsvp.status === 'going' ? 
+        rsvpStatus.innerHTML = userRsvp.status === 'going' ? 
           '✅ 你已确定参加此活动' : 
           '🤔 你已表示对此活动感兴趣';
         rsvpStatus.className = 'rsvp-status success';
         
         cancelButton.style.display = 'inline-block';
         rsvpButtons.style.display = 'none';
+        
+        // Show QR code section when user has RSVP
+        if (qrCodeSection) {
+          qrCodeSection.style.display = 'block';
+        }
       } else {
         // User has no RSVP
         rsvpStatus.textContent = '';
@@ -564,6 +608,11 @@
         
         cancelButton.style.display = 'none';
         rsvpButtons.style.display = 'flex';
+        
+        // Hide QR code section when user has no RSVP
+        if (qrCodeSection) {
+          qrCodeSection.style.display = 'none';
+        }
       }
     }
     
@@ -582,6 +631,14 @@
         allRsvps = rsvps || [];
         
         document.getElementById("meetup-title").textContent = meetup.title;
+        
+        // Update QR code image if available
+        if (meetup.qrcode) {
+          const qrCodeImg = document.querySelector('.qr-code-image');
+          if (qrCodeImg) {
+            qrCodeImg.src = meetup.qrcode;
+          }
+        }
         // Format datetime with timezone information
         const formatDateTime = (datetimeStr) => {
           const date = new Date(datetimeStr);
@@ -726,6 +783,12 @@
           
           // Close dialog
           closeConfirmDialog();
+          
+          // Hide QR code section
+          const qrCodeSection = document.getElementById('qr-code-section');
+          if (qrCodeSection) {
+            qrCodeSection.style.display = 'none';
+          }
         } else {
           alert('取消失败');
           closeConfirmDialog();

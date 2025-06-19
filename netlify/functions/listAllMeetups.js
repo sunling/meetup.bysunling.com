@@ -16,10 +16,10 @@ export async function handler(event, context) {
   }
 
   try {
+    // Get all meetups regardless of status for admin review
     const { data, error } = await supabase
       .from('meetups')
-      .select('id, title, datetime, location, description, qrcode, status')
-      .or('status.eq.approved,status.is.null')
+      .select('id, title, datetime, location, description, wechat_id, status')
       .order('datetime', { ascending: false });
 
     if (error) {

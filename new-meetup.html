@@ -84,6 +84,17 @@
   <script>
     let qrcodeBase64 = '';
 
+    // 设置活动时间默认值为当前系统时间
+    window.addEventListener('DOMContentLoaded', function() {
+      const now = new Date();
+      const localDateTime = now.getFullYear() + '-' + 
+        String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+        String(now.getDate()).padStart(2, '0') + 'T' + 
+        String(now.getHours()).padStart(2, '0') + ':' + 
+        String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('datetime').value = localDateTime;
+    });
+
     document.getElementById("qrcodeInput").addEventListener("change", function() {
       const file = this.files[0];
       if (file) {
@@ -99,27 +110,43 @@
 
     async function submitForm() {
       const title = document.getElementById("title").value.trim();
-      const datetime = document.getElementById("datetime").value;
+      const datetimeLocal = document.getElementById("datetime").value;
       const location = document.getElementById("location").value.trim();
       const description = document.getElementById("description").value.trim();
       const wechat = document.getElementById("wechat").value.trim();
 
-      if (!title || !datetime || !location || !description || !wechat) {
+      if (!title || !datetimeLocal || !location || !description || !wechat) {
         document.getElementById("message").innerText = "请填写所有必填信息";
         return;
       }
 
+      // 将本地时间转换为带时区的ISO字符串
+      const datetime = new Date(datetimeLocal).toISOString();
+
       // 先上传二维码图片（可复用你现有 uploadImageToGitHub）
       let qrcodeUrl = '';
       if (qrcodeBase64) {
-        const uploadResp = await fetch("/.netlify/functions/uploadImageToGitHub", {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ base64Image: qrcodeBase64 })
-        });
-        const uploadResult = await uploadResp.json();
-        if (uploadResp.ok && uploadResult.success) {
-          qrcodeUrl = uploadResult.url;
+        try {
+          const uploadResp = await fetch("/.netlify/functions/uploadImageToGitHub", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ base64Image: qrcodeBase64 })
+          });
+          const uploadResult = await uploadResp.json();
+          console.log('Upload response:', uploadResult);
+          
+          if (uploadResp.ok && uploadResult.success) {
+            qrcodeUrl = uploadResult.url;
+            console.log('QR code uploaded successfully:', qrcodeUrl);
+          } else {
+            console.error('QR code upload failed:', uploadResult);
+            document.getElementById("message").innerText = `二维码上传失败: ${uploadResult.error || '未知错误'}`;
+            return;
+          }
+        } catch (uploadError) {
+          console.error('QR code upload error:', uploadError);
+          document.getElementById("message").innerText = '二维码上传时发生错误';
+          return;
         }
       }
 

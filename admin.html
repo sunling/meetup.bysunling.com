@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活动审核管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .auth-section {
+            padding: 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .auth-form {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-form input {
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            min-width: 300px;
+        }
+
+        .auth-form button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .auth-form button:hover {
+            transform: translateY(-2px);
+        }
+
+        .meetups-section {
+            padding: 30px;
+            display: none;
+        }
+
+        .meetup-card {
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            background: #f9f9f9;
+        }
+
+        .meetup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .meetup-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-legacy {
+            background: #e2e3e5;
+            color: #495057;
+        }
+
+        .meetup-details {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .meetup-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .approve-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .reject-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .message {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .section-header {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin: 30px 0 20px 0;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>活动审核管理</h1>
+            <p>管理员审核系统</p>
+        </div>
+
+        <div class="auth-section" id="authSection">
+            <div class="auth-form">
+                <input type="password" id="adminToken" placeholder="请输入管理员密码">
+                <button onclick="authenticate()">登录</button>
+            </div>
+        </div>
+
+        <div class="meetups-section" id="meetupsSection">
+            <div id="message"></div>
+            <div id="meetupsList"></div>
+        </div>
+    </div>
+
+    <script>
+        let adminToken = '';
+
+        function authenticate() {
+            adminToken = document.getElementById('adminToken').value;
+            if (!adminToken) {
+                showMessage('请输入管理员密码', 'error');
+                return;
+            }
+
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('meetupsSection').style.display = 'block';
+            loadMeetups();
+        }
+
+        async function loadMeetups() {
+            const meetupsList = document.getElementById('meetupsList');
+            meetupsList.innerHTML = '<div class="loading">加载中...</div>';
+
+            try {
+                const response = await fetch('/.netlify/functions/listAllMeetups');
+                if (!response.ok) {
+                    throw new Error('获取活动列表失败');
+                }
+
+                const meetups = await response.json();
+                displayMeetups(meetups);
+            } catch (error) {
+                meetupsList.innerHTML = '<div class="message error">加载失败: ' + error.message + '</div>';
+            }
+        }
+
+        function displayMeetups(meetups) {
+            const meetupsList = document.getElementById('meetupsList');
+            
+            if (meetups.length === 0) {
+                meetupsList.innerHTML = '<div class="message">暂无活动</div>';
+                return;
+            }
+
+            // 按时间升序排序
+            meetups.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+
+            // 分组：待审核和已审核
+            const pendingMeetups = meetups.filter(meetup => {
+                const status = meetup.status || 'pending';
+                return status === 'pending';
+            });
+            
+            const reviewedMeetups = meetups.filter(meetup => {
+                const status = meetup.status || 'pending';
+                return status !== 'pending';
+            });
+
+            let html = '';
+
+            // 待审核区域
+            if (pendingMeetups.length > 0) {
+                html += '<div class="section-header">待审核活动</div>';
+                html += pendingMeetups.map(meetup => createMeetupCard(meetup)).join('');
+            }
+
+            // 已审核区域
+            if (reviewedMeetups.length > 0) {
+                html += '<div class="section-header">已审核活动</div>';
+                html += reviewedMeetups.map(meetup => createMeetupCard(meetup)).join('');
+            }
+
+            meetupsList.innerHTML = html;
+        }
+
+        function createMeetupCard(meetup) {
+            return `
+                <div class="meetup-card">
+                    <div class="meetup-header">
+                        <div class="meetup-title">${meetup.title}</div>
+                        <div class="status-badge status-${meetup.status === null ? 'legacy' : (meetup.status || 'pending')}">
+                            ${getStatusText(meetup.status)}
+                        </div>
+                    </div>
+                    <div class="meetup-details">
+                        <p><strong>时间:</strong> ${new Date(meetup.datetime).toLocaleString('zh-CN')}</p>
+                        <p><strong>地点:</strong> ${meetup.location}</p>
+                        <p><strong>描述:</strong> ${meetup.description}</p>
+                        <p><strong>微信:</strong> ${meetup.wechat_id}</p>
+                    </div>
+                    <div class="meetup-actions">
+                        <button class="action-btn approve-btn" onclick="updateStatus('${meetup.id}', 'approved')">
+                            批准
+                        </button>
+                        <button class="action-btn reject-btn" onclick="updateStatus('${meetup.id}', 'rejected')">
+                            拒绝
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': '待审核',
+                'approved': '已批准',
+                'rejected': '已拒绝',
+                null: '旧数据(视为已批准)',
+                undefined: '旧数据(视为已批准)'
+            };
+            return statusMap[status] || '未知';
+        }
+
+        async function updateStatus(meetupId, status) {
+            try {
+                const response = await fetch('/.netlify/functions/approveMeetup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        meetup_id: meetupId,
+                        status: status,
+                        admin_token: adminToken
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showMessage(result.message, 'success');
+                    loadMeetups(); // 重新加载列表
+                } else {
+                    showMessage(result.error || '操作失败', 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误: ' + error.message, 'error');
+            }
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

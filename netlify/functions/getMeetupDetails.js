@@ -27,7 +27,7 @@ export async function handler(event, context) {
     if (token) {
       const { data, error } = await supabase
         .from('meetups')
-        .select('id, title, datetime, location, description, wechat_id')
+        .select('id, title, datetime, location, description, wechat_id, qrcode')
         .eq('manage_token', token)
         .maybeSingle();
 
@@ -47,8 +47,9 @@ export async function handler(event, context) {
     if (!meetup && resolvedMeetupId) {
       const { data, error } = await supabase
         .from('meetups')
-        .select('id, title, datetime, location, description')
+        .select('id, title, datetime, location, description, status, qrcode')
         .eq('id', resolvedMeetupId)
+        .or('status.eq.approved,status.is.null')
         .maybeSingle();
 
       if (error || !data) {
