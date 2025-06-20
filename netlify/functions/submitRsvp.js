@@ -19,10 +19,18 @@ export async function handler(event) {
   try {
     const { meetup_id, name, wechat_id, status } = JSON.parse(event.body);
 
-    if (!meetup_id || !name || !wechat_id || !status) {
+    if (!meetup_id || !name || !status) {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: 'Missing required fields' }),
+      };
+    }
+
+    // 只有在"确定参加"时才要求微信号
+    if (status === 'going' && !wechat_id) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'WeChat ID is required for going status' }),
       };
     }
 

@@ -78,38 +78,7 @@
       margin-top: 1em;
       color: #d9534f;
     }
-    .success-message {
-      margin-top: 1em;
-      padding: 1.5em;
-      background: linear-gradient(135deg, #d4edda, #c3e6cb);
-      border: 1px solid #c3e6cb;
-      border-radius: 8px;
-      color: #155724;
-      display: none;
-    }
-    .success-message h3 {
-      margin: 0 0 1em 0;
-      color: #155724;
-    }
-    .success-message .manage-link {
-      background: #fff;
-      padding: 0.8em;
-      border-radius: 4px;
-      border: 1px solid #b8daff;
-      margin: 1em 0;
-      word-break: break-all;
-      font-family: monospace;
-      font-size: 0.9em;
-    }
-    .success-message .tips {
-      margin-top: 1em;
-      padding-top: 1em;
-      border-top: 1px solid #b8daff;
-    }
-    .success-message .tips ul {
-      margin: 0.5em 0;
-      padding-left: 1.2em;
-    }
+
   </style>
 </head>
 <body>
@@ -117,55 +86,107 @@
     <h1 class="title-dopamine">发起活动</h1>
     <a href="/" class="home-link">回到首页</a>
 
-    <label>活动标题</label>
+    <label>活动标题 <span style="color: red;">*</span></label>
     <input id="title" placeholder="请输入活动标题"/>
 
-    <label>活动时间</label>
+    <label>活动时间 <span style="color: red;">*</span></label>
     <input id="datetime" type="datetime-local" />
 
-    <label>活动地点</label>
+    <label>活动地点 <span style="color: red;">*</span></label>
     <input id="location" placeholder="请输入集合地点"/>
 
-    <label>活动时长（小时）</label>
+    <label>活动时长（小时） <span style="color: red;">*</span></label>
     <input id="duration" type="number" step="0.5" min="0.5" placeholder="请输入活动时长，如：2 或 1.5"/>
 
-    <label>活动描述</label>
+    <label>活动描述 <span style="color: red;">*</span></label>
     <textarea id="description" rows="5" placeholder="请填写活动内容"></textarea>
 
-    <label>微信号</label>
+    <label>微信号 <span style="color: red;">*</span></label>
     <input id="wechat" placeholder="请输入你的微信号"/>
 
     <label>活动群二维码</label>
     <input id="qrcodeInput" type="file" accept="image/*"/>
     <img id="qrcodePreview" class="qrcode-preview" style="display:none"/>
-
     <div class="message" id="message"></div>
-    
-    <div class="success-message" id="success-message">
-      <h3>🎉 活动创建成功！</h3>
-      
-      <p><strong>📋 管理页面链接（请保存）：</strong></p>
-      <div class="manage-link" id="manage-link-display"></div>
-      
-      <p><strong>🔗 活动报名链接（分享给参与者）：</strong></p>
-      <div class="manage-link" id="meetup-link-display"></div>
-      
-      <div class="tips">
-        <p><strong>💡 温馨提示：</strong></p>
-        <ul>
-          <li>管理页面可以编辑活动信息和查看报名情况</li>
-          <li>活动报名链接可以分享给朋友们，让他们报名参加</li>
-          <li>如果微信群二维码过期，请使用管理页面更新</li>
-          <li>点击管理链接可以跳转到管理页面</li>
-        </ul>
-      </div>
-    </div>
-
     <button onclick="submitForm()">提交活动</button>
   </div>
-
+  <script type="module" src="scripts/cacheManager.js"></script>
+  <script type="module" src="scripts/apiWithCache.js"></script>
   <script>
     let qrcodeBase64 = '';
+    // 将submitForm函数定义为全局函数
+    window.submitForm = async function() {
+      const title = document.getElementById("title").value.trim();
+      const datetimeLocal = document.getElementById("datetime").value;
+      const location = document.getElementById("location").value.trim();
+      const duration = parseFloat(document.getElementById("duration").value);
+      const description = document.getElementById("description").value.trim();
+      const wechat = document.getElementById("wechat").value.trim();
+
+      if (!title || !datetimeLocal || !location || !description || !wechat) {
+        document.getElementById("message").innerText = "请填写所有必填信息";
+        return;
+      }
+
+      if (!duration || duration <= 0) {
+        document.getElementById("message").innerText = "请输入有效的活动时长";
+        return;
+      }
+
+      // 使用统一的时间处理函数创建时间对象
+      const datetime = TimeUtils.createDateTimeObject(datetimeLocal);
+
+      // 先上传二维码图片
+      let qrcodeUrl = '';
+      if (qrcodeBase64) {
+        try {
+          const { apiWithCache } = await import('./scripts/apiWithCache.js');
+          const uploadResult = await apiWithCache.uploadImageToGitHub({ base64Image: qrcodeBase64 });
+          console.log('Upload response:', uploadResult);
+          
+          if (uploadResult.success) {
+            qrcodeUrl = uploadResult.url;
+            console.log('QR code uploaded successfully:', qrcodeUrl);
+          } else {
+            console.error('QR code upload failed:', uploadResult);
+            document.getElementById("message").innerText = `二维码上传失败: ${uploadResult.error || '未知错误'}`;
+            return;
+          }
+        } catch (uploadError) {
+          console.error('QR code upload error:', uploadError);
+          document.getElementById("message").innerText = '二维码上传时发生错误';
+          return;
+        }
+      }
+
+      try {
+        const { apiWithCache } = await import('./scripts/apiWithCache.js');
+        const result = await apiWithCache.createMeetup({ title, datetime, location, duration, description, wechat, qrcode: qrcodeUrl });
+
+        if (result.id && result.manage_token) {
+          const manageLink = `${window.location.origin}/meetup-manage?token=${result.manage_token}`;
+          
+          // 直接跳转到管理页面
+          window.location.href = manageLink;
+        } else {
+          document.getElementById("message").innerText = result.error || "提交失败";
+        }
+      } catch (error) {
+        console.error('Create meetup error:', error);
+        document.getElementById("message").innerText = "创建活动时发生错误";
+      }
+    };
+    
+    window.copyToClipboard = function(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('链接已复制到剪贴板！');
+      }).catch(err => {
+        console.error('复制失败:', err);
+        alert('复制失败，请手动复制');
+      });
+    };
+  </script>
+  <script type="module">
 
     // 设置活动时间默认值为当前系统时间
     window.addEventListener('DOMContentLoaded', function() {
@@ -191,72 +212,7 @@
       }
     });
 
-    async function submitForm() {
-      const title = document.getElementById("title").value.trim();
-      const datetimeLocal = document.getElementById("datetime").value;
-      const location = document.getElementById("location").value.trim();
-      const duration = parseFloat(document.getElementById("duration").value);
-      const description = document.getElementById("description").value.trim();
-      const wechat = document.getElementById("wechat").value.trim();
 
-      if (!title || !datetimeLocal || !location || !description || !wechat) {
-        document.getElementById("message").innerText = "请填写所有必填信息";
-        return;
-      }
-
-      if (!duration || duration <= 0) {
-        document.getElementById("message").innerText = "请输入有效的活动时长";
-        return;
-      }
-
-      // 使用统一的时间处理函数创建时间对象
-      const datetime = TimeUtils.createDateTimeObject(datetimeLocal);
-
-      // 先上传二维码图片（可复用你现有 uploadImageToGitHub）
-      let qrcodeUrl = '';
-      if (qrcodeBase64) {
-        try {
-          const uploadResp = await fetch("/.netlify/functions/uploadImageToGitHub", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ base64Image: qrcodeBase64 })
-          });
-          const uploadResult = await uploadResp.json();
-          console.log('Upload response:', uploadResult);
-          
-          if (uploadResp.ok && uploadResult.success) {
-            qrcodeUrl = uploadResult.url;
-            console.log('QR code uploaded successfully:', qrcodeUrl);
-          } else {
-            console.error('QR code upload failed:', uploadResult);
-            document.getElementById("message").innerText = `二维码上传失败: ${uploadResult.error || '未知错误'}`;
-            return;
-          }
-        } catch (uploadError) {
-          console.error('QR code upload error:', uploadError);
-          document.getElementById("message").innerText = '二维码上传时发生错误';
-          return;
-        }
-      }
-
-      const response = await fetch("/.netlify/functions/createMeetup", {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, datetime, location, duration, description, wechat, qrcode: qrcodeUrl })
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        const manageLink = `${window.location.origin}/meetup-manage?token=${result.manage_token}`;
-        
-        // 直接跳转到管理页面
-        window.location.href = manageLink;
-        
-      } else {
-        document.getElementById("message").innerText = result.error || "提交失败";
-      }
-    }
   </script>
 </body>
 </html>

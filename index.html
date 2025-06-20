@@ -238,7 +238,7 @@
     <div id="event-details" class="event-details" style="display: none;">
       <div class="event-details-header">
         <h3 id="selected-date-title"></h3>
-        <a href="index" class="home-link" onclick="showDateGroups(); return false;">回到首页</a>
+        <a href="/" class="home-link" onclick="showDateGroups(); return false;">回到首页</a>
       </div>
       <div class="event-list" id="selected-date-events"></div>
     </div>
@@ -247,9 +247,11 @@
   <!-- 悬浮新建活动按钮 -->
   <a href="new-meetup" class="floating-new-meetup" title="点击发起活动">+</a>
 
-  <script src="scripts/gradientConfig.js"></script>
+  <script type="module" src="scripts/gradientConfig.js"></script>
   <script src="scripts/timeUtils.js"></script>
-  <script>
+  <script type="module" src="scripts/cacheManager.js"></script>
+  <script type="module" src="scripts/apiWithCache.js"></script>
+  <script type="module">
     function categorizeEventsByTime(meetups) {
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -325,8 +327,9 @@
 
     async function loadEvents() {
       try {
-        const response = await fetch('/.netlify/functions/listMeetups');
-        const events = await response.json();
+        // 使用缓存API获取活动列表
+        const { apiWithCache } = await import('./scripts/apiWithCache.js');
+        const events = await apiWithCache.getMeetupsSmartRefresh();
         
         // 按日期分组所有活动（包括过去和未来的活动）
         const eventsByDate = groupEventsByDate(events);
@@ -412,8 +415,10 @@
       document.getElementById('selected-date-events').innerHTML = eventsHtml;
       document.getElementById('date-groups').style.display = 'none';
       document.getElementById('event-details').style.display = 'block';
-      // 原新建活动按钮已移除
     }
+    
+    // 将函数暴露到全局作用域
+    window.showDateEvents = showDateEvents;
     
     function showDateGroups() {
       // 清除URL中的日期参数
@@ -500,6 +505,9 @@
        const url = `meetup?id=${meetupId}&action=${action}`;
        window.location.href = url;
      }
+
+    // 将函数暴露到全局作用域
+    window.goToMeetup = goToMeetup;
 
     // 监听浏览器回退/前进按钮
     window.addEventListener('popstate', function(event) {

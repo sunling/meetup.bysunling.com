@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>管理活动信息</title>
   <script src="./scripts/timeUtils.js"></script>
+  <script type="module" src="scripts/cacheManager.js"></script>
+  <script type="module" src="scripts/apiWithCache.js"></script>
   <link rel="stylesheet" href="./styles/shared.css">
   <style>
     .container {
@@ -367,7 +369,7 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
     async function loadMeetupData() {
       const token = new URLSearchParams(window.location.search).get("token");
       if (!token) {
@@ -376,13 +378,9 @@
       }
 
       try {
-        const res = await fetch(`/.netlify/functions/getMeetupDetails?token=${token}`);
-        const result = await res.json();
-
-        if (!res.ok || result.error) {
-          document.getElementById("meetup-info").innerHTML = `❌ 读取活动失败：${result.error}`;
-          return;
-        }
+        // 使用缓存API获取活动详情
+        const { apiWithCache } = await import('./scripts/apiWithCache.js');
+        const result = await apiWithCache.getMeetupDetails(null, token);
 
         const { meetup, rsvps } = result;
 
@@ -613,35 +611,21 @@
         updateBtn.textContent = '上传中...';
 
         try {
+          const { apiWithCache } = await import('./scripts/apiWithCache.js');
+          
           // First upload the image
-          const uploadRes = await fetch('/.netlify/functions/uploadImageToGitHub', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ base64Image: qrcodeBase64 })
-          });
+          const uploadResult = await apiWithCache.uploadImageToGitHub({ base64Image: qrcodeBase64 });
 
-          const uploadResult = await uploadRes.json();
-
-          if (!uploadRes.ok || uploadResult.error) {
+          if (!uploadResult.success) {
             throw new Error(uploadResult.error || '图片上传失败');
           }
 
           const qrcodeUrl = uploadResult.url;
 
           // Then update the meetup with new QR code URL
-          const updateRes = await fetch('/.netlify/functions/updateMeetup', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ token, qrcode: qrcodeUrl })
-          });
+          const updateResult = await apiWithCache.updateMeetup({ token, qrcode: qrcodeUrl });
 
-          const updateResult = await updateRes.json();
-
-          if (!updateRes.ok || updateResult.error) {
+          if (!updateResult.success) {
             throw new Error(updateResult.error || '二维码更新失败');
           }
 
@@ -722,23 +706,16 @@
           // 使用统一的时间处理函数创建时间对象
           const datetimeWithTimezone = TimeUtils.createDateTimeObject(datetime);
 
-          const response = await fetch('/.netlify/functions/updateMeetup', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              token,
-              title,
-              datetime: datetimeWithTimezone,
-              location,
-              description
-            })
+          const { apiWithCache } = await import('./scripts/apiWithCache.js');
+          const result = await apiWithCache.updateMeetup({
+            token,
+            title,
+            datetime: datetimeWithTimezone,
+            location,
+            description
           });
 
-          const result = await response.json();
-
-          if (!response.ok || result.error) {
+          if (!result.success) {
             throw new Error(result.error || '更新失败');
           }
 

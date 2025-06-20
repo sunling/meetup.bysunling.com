@@ -462,6 +462,8 @@
       height: auto;
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: block;
+      margin: 0 auto;
     }
 
     @media (max-width: 768px) {
@@ -557,7 +559,8 @@
               </div>
             </div>
 
-            <button class="btn btn-secondary" id="cancel-rsvp-button" style="display:none; background: #f5f5f5 !important; color: #666 !important; border: 1px solid #ddd !important;">
+            <button class="btn btn-secondary" id="cancel-rsvp-button"
+              style="display:none; background: #f5f5f5 !important; color: #666 !important; border: 1px solid #ddd !important;">
               取消我的报名
             </button>
           </div>
@@ -576,10 +579,13 @@
     <!-- QR Code Section -->
     <div class="qr-code-section" id="qr-code-section">
       <h3>🎉 报名成功！</h3>
-      <p>扫描下方二维码加入活动微信群，获取最新活动信息和与其他参与者交流：</p>
-      <img src="https://via.placeholder.com/200x200/FFB6C1/666666?text=微信群二维码" alt="微信群二维码" class="qr-code-image">
+      <p id="qr-code-instruction">扫描下方二维码加入活动微信群，获取最新活动信息和与其他参与者交流：</p>
+      <img src="" alt="微信群二维码" class="qr-code-image" style="display: none;">
+      <p id="no-qr-message" style="font-size: 0.9em; margin-top: 1em; display: none; color: #666;">
+        暂无微信群二维码，请联系活动组织者获取入群方式。</p>
       <p style="font-size: 0.9em; margin-top: 1em;">如果二维码过期，请联系活动组织者（微信号：<span id="organizer-contact"
-          style="font-size: 0.9em; margin-top: 0.5em; color: #666;"></spa></p>
+          style="font-size: 0.9em; margin-top: 0.5em; color: #666;"></span>
+      </p>
     </div>
 
     <div class="share-section" style="padding: 20px 40px; border-top: 1px solid #e0e0e0;">
@@ -589,7 +595,7 @@
   </div>
 
   <!-- 悬浮新建活动按钮 -->
-<a href="new-meetup" class="floating-new-meetup" title="点击发起活动">+</a>
+  <a href="new-meetup" class="floating-new-meetup" title="点击发起活动">+</a>
 
   <!-- RSVP Dialog -->
   <div class="dialog-overlay" id="rsvp-dialog">
@@ -633,7 +639,10 @@
     </div>
   </div>
 
-  <script>
+  <script src="scripts/timeUtils.js"></script>
+  <script type="module" src="scripts/cacheManager.js"></script>
+  <script type="module" src="scripts/apiWithCache.js"></script>
+  <script type="module">
     let meetup_id = null;
     let allRsvps = [];
     const dialog = document.getElementById('rsvp-dialog');
@@ -782,13 +791,13 @@
     async function loadMeetupData() {
       meetup_id = new URLSearchParams(window.location.search).get("id");
       if (!meetup_id) {
-        document.getElementById("meetup-info").innerHTML = "缺少 meeting id 参数。";
+        document.getElementById("meetup-description").innerHTML = "<p>缺少 meeting id 参数。</p>";
         return;
       }
       try {
-        const res = await fetch(`/.netlify/functions/getMeetupDetails?id=${meetup_id}`);
-        const result = await res.json();
-        if (!res.ok && result.error) throw new Error(result.error);
+        // 使用缓存API获取活动详情
+        const { apiWithCache } = await import('./scripts/apiWithCache.js');
+        const result = await apiWithCache.getMeetupDetails(meetup_id);
 
         const { meetup, rsvps } = result;
         allRsvps = rsvps || [];
@@ -796,11 +805,20 @@
         document.getElementById("meetup-title").textContent = meetup.title;
 
         // Update QR code image if available
-        if (meetup.qrcode) {
-          const qrCodeImg = document.querySelector('.qr-code-image');
-          if (qrCodeImg) {
-            qrCodeImg.src = meetup.qrcode;
-          }
+        const qrCodeImg = document.querySelector('.qr-code-image');
+        const qrCodeInstruction = document.getElementById('qr-code-instruction');
+        const noQrMessage = document.getElementById('no-qr-message');
+
+        if (meetup.qrcode && qrCodeImg) {
+          qrCodeImg.src = meetup.qrcode;
+          qrCodeImg.style.display = 'block';
+          if (qrCodeInstruction) qrCodeInstruction.style.display = 'block';
+          if (noQrMessage) noQrMessage.style.display = 'none';
+        } else {
+          // Hide the image and show no QR message if no QR code is available
+          if (qrCodeImg) qrCodeImg.style.display = 'none';
+          if (qrCodeInstruction) qrCodeInstruction.style.display = 'none';
+          if (noQrMessage) noQrMessage.style.display = 'block';
         }
 
         // Update organizer contact if available
@@ -865,7 +883,7 @@
           }, 500);
         }
       } catch (err) {
-        document.getElementById("meetup-info").innerHTML = `加载失败：${err.message}`;
+        document.getElementById("meetup-description").innerHTML = `<p>加载失败：${err.message}</p>`;
       }
     }
 
@@ -949,7 +967,7 @@
           avatar.title = `${item.name} - 确定参加`;
           avatar.style.background = getGoingGradient();
           avatar.style.color = "white";
-          
+
           // Highlight current user's avatar
           if (isCurrentUserRsvp(item)) {
             avatar.style.width = '50px';
@@ -960,7 +978,7 @@
             avatar.style.zIndex = '10';
             avatar.style.position = 'relative';
           }
-          
+
           goingRow.appendChild(avatar);
         });
 
@@ -989,7 +1007,7 @@
           avatar.title = `${item.name} - 感兴趣`;
           avatar.style.background = getMaybeGradient();
           avatar.style.color = '#333';
-          
+
           // Highlight current user's avatar
           if (isCurrentUserRsvp(item)) {
             avatar.style.width = '50px';
@@ -1000,7 +1018,7 @@
             avatar.style.zIndex = '10';
             avatar.style.position = 'relative';
           }
-          
+
           maybeRow.appendChild(avatar);
         });
 
@@ -1010,24 +1028,17 @@
       attendeesSection.style.display = 'block';
     }
 
-
-
     async function cancelRsvp() {
       const userData = getUserData();
       if (!userData) return;
 
       try {
-        const res = await fetch('/.netlify/functions/deleteRsvp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            meetup_id,
-            name: userData.name,
-            wechat_id: userData.wechat
-          })
-        });
+        // 使用缓存API删除RSVP
+        const { apiWithCache } = await import('./scripts/apiWithCache.js');
+        const result = await apiWithCache.deleteRsvp(meetup_id, userData.name, userData.wechat);
 
-        if (res.ok) {
+        if (result.success) {
+          // 删除成功后更新UI
           // Remove user data from localStorage
           removeUserData();
 
@@ -1083,15 +1094,12 @@
       }
 
       try {
-        const response = await fetch("/.netlify/functions/submitRsvp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ meetup_id, name, wechat_id: wechat, status }),
-        });
+        // 使用缓存API提交RSVP
+        const { apiWithCache } = await import('./scripts/apiWithCache.js');
+        const result = await apiWithCache.submitRsvp({ meetup_id, name, wechat_id: wechat, status });
 
-        const result = await response.json();
-
-        if (response.ok) {
+        if (result.success) {
+          // 提交成功后更新UI
           // Save user data to localStorage
           saveUserData(name, wechat);
 
@@ -1182,6 +1190,7 @@
         closeConfirmDialog();
       }
     });
+
 
     // Initialize
     loadMeetupData();
