@@ -211,6 +211,26 @@
 </head>
 
 <body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <div class="logo-section">
+        <div class="logo">
+          <img src="logo.svg" alt="聚友圈Logo" width="40" height="40">
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-name">聚友圈</h1>
+          <p class="brand-slogan">连接每一个精彩瞬间</p>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <a href="/" class="nav-link">首页</a>
+        <a href="new-meetup" class="nav-link">发起活动</a>
+        <a href="admin" class="nav-link active">管理</a>
+      </nav>
+    </div>
+  </header>
+
     <div class="container">
         <div class="header">
             <h1 class="title-dopamine">活动审核管理</h1>
@@ -371,6 +391,19 @@
         // 将updateStatus函数暴露到全局作用域
         window.updateStatus = updateStatus;
     </script>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-container">
+        <div class="footer-simple">
+          <div class="footer-logo">
+            <img src="logo.svg" alt="聚友圈Logo" width="24" height="24">
+            <span class="footer-brand">聚友圈</span>
+          </div>
+          <p class="footer-text">&copy; 2025 聚友圈 - 连接每一个精彩瞬间</p>
+        </div>
+      </div>
+    </footer>
 
     <!-- 悬浮新建活动按钮 -->
     <a href="new-meetup" class="floating-new-meetup" title="点击发起活动">+</a>

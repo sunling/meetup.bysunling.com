@@ -22,72 +22,50 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", "Arial", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       margin: 0;
-      padding: 20px;
-      background-color: var(--bg-color);
+      padding: 0;
+      background: var(--bg-primary);
       color: var(--text-color);
       line-height: 1.6;
+      min-height: 100vh;
     }
 
     .container {
       max-width: 1000px;
       margin: 0 auto;
-      background-color: #fff;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-      overflow: hidden;
+      padding: 0 1rem;
     }
 
-    /* --- 头部 --- */
-    header {
-      padding: 30px 40px;
-      border-bottom: 1px solid #e0e0e0;
-      position: relative;
-    }
-
-    header h1 {
-      font-size: 2.2em;
-      margin: 0;
-      color: #1a1a1a;
-    }
-
-    .home-link {
-      position: absolute;
-      top: 30px;
-      right: 40px;
-      background: linear-gradient(135deg, #ff6b9d 0%, #ffa726 50%, #42a5f5 100%);
-      color: white;
-      text-decoration: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      font-size: 0.9em;
-      transition: all 0.3s ease;
-    }
-
-    .home-link:hover {
-      background: linear-gradient(135deg, #e55a8a 0%, #f57c00 50%, #1976d2 100%);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
-    }
+    /* 页面头部样式已在后面统一定义 */
 
     /* --- 主布局 (左右分栏) --- */
     .main-layout {
       display: flex;
       flex-wrap: wrap;
-      padding: 20px 40px;
+      padding: 20px 0;
     }
 
     main {
       flex: 1;
       min-width: 60%;
-      padding-right: 40px;
+      margin-right: 2rem;
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
     }
 
     aside {
       flex-basis: 300px;
       flex-shrink: 0;
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+      height: fit-content;
     }
 
     /* --- 左侧内容区 --- */
@@ -121,10 +99,9 @@
 
     /* --- 右侧信息卡片 --- */
     .info-card {
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 20px;
-      background-color: #fdfdfd;
+      background: transparent;
+      border: none;
+      padding: 0;
     }
 
     .info-card h3 {
@@ -466,6 +443,41 @@
       margin: 0 auto;
     }
 
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2em;
+      padding-bottom: 1em;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .page-header h1 {
+      margin: 0;
+      font-size: 2.2em;
+      color: #1a1a1a;
+    }
+
+    .page-header .home-link {
+      display: inline-block;
+      background: linear-gradient(135deg, #ff6b9d 0%, #ffa726 50%, #42a5f5 100%);
+      color: white;
+      text-decoration: none;
+      padding: 0.7em 1.5em;
+      border-radius: 6px;
+      font-size: 0.9em;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-header .home-link:hover {
+      background: linear-gradient(135deg, #e55a8a 0%, #f57c00 50%, #1976d2 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
+    }
+
     @media (max-width: 768px) {
       body {
         padding: 10px;
@@ -476,17 +488,33 @@
       }
 
       main {
-        padding-right: 0;
-        padding-bottom: 20px;
+        margin-right: 0;
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
       }
 
-      header,
+      aside {
+        padding: 1rem;
+      }
+
       .main-layout {
-        padding: 20px;
+        padding: 20px 1rem;
       }
 
-      header h1 {
-        font-size: 1.8em;
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1em;
+      }
+
+      .page-header h1 {
+        font-size: 1.5em;
+      }
+
+      .page-header .home-link {
+        align-self: flex-end;
+        font-size: 0.8em;
+        padding: 0.6em 1.2em;
       }
 
       .rsvp-buttons {
@@ -505,14 +533,33 @@
 </head>
 
 <body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <div class="logo-section">
+        <div class="logo">
+          <img src="logo.svg" alt="聚友圈Logo" width="40" height="40">
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-name">聚友圈</h1>
+          <p class="brand-slogan">连接每一个精彩瞬间</p>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <a href="/" class="nav-link">首页</a>
+        <a href="new-meetup" class="nav-link">发起活动</a>
+        <a href="meetup-manage" class="nav-link">管理</a>
+      </nav>
+    </div>
+  </header>
+
   <div class="container">
-    <header>
-      <h1 id="meetup-title" class="title-dopamine">活动详情</h1>
-      <a href="/" class="home-link">回到首页</a>
-    </header>
 
     <div class="main-layout">
       <main>
+        <div class="page-header">
+          <h1 id="meetup-title" class="title-dopamine">活动详情</h1>
+        </div>
         <article>
           <div id="meetup-description" class="event-description">
             <p>正在加载活动信息...</p>
@@ -607,8 +654,8 @@
         <form class="dialog-form" id="rsvp-form">
           <input type="hidden" id="status" value="going">
 
-          <label for="name">你的昵称 <span style="color: red;">*</span></label>
-          <input type="text" id="name" required placeholder="请输入你的昵称" />
+          <label for="name">你的名字 <span style="color: red;">*</span></label>
+          <input type="text" id="name" required placeholder="请输入你的名字" />
 
           <label for="wechat">你的微信号 <span id="wechat-required" style="color: red;">*</span></label>
           <input type="text" id="wechat" required placeholder="请输入你的微信号" />
@@ -1195,6 +1242,23 @@
     // Initialize
     loadMeetupData();
   </script>
+
+  <!-- 悬浮新建活动按钮 -->
+  <a href="new-meetup" class="floating-new-meetup" title="发起新活动">+</a>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-simple">
+        <div class="footer-logo">
+          <img src="logo.svg" alt="聚友圈Logo" width="24" height="24">
+          <span class="footer-brand">聚友圈</span>
+        </div>
+        <p class="footer-text">&copy; 2025 聚友圈 - 连接每一个精彩瞬间</p>
+      </div>
+    </div>
+  </footer>
+
 </body>
 
 </html>

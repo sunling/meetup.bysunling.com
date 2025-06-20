@@ -10,9 +10,52 @@
   <script type="module" src="scripts/apiWithCache.js"></script>
   <link rel="stylesheet" href="./styles/shared.css">
   <style>
+    /* Token input styles */
+    .input-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .form-control {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(139, 69, 255, 0.1);
+    }
+
+    .status-message.error {
+      color: #dc3545;
+      font-weight: 500;
+    }
+
+    .status-message.success {
+      color: #28a745;
+      font-weight: 500;
+    }
+
     .container {
-      max-width: 800px;
+      max-width: 800px !important;
       padding: 2rem 1.5rem;
+      min-height: calc(100vh - 200px);
+    }
+
+    #token-input-section {
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+    }
+
+    #token-input-section .card-body {
+      width: 100%;
     }
 
     .page-header {
@@ -321,49 +364,82 @@
 </head>
 
 <body>
-  <div class="container">
-    <div class="page-header mb-4">
-      <h1 class="title-dopamine">活动管理页</h1>
-      <a href="/" class="btn btn-dopamine home-link">回到首页</a>
-    </div>
-
-    <div class="card mb-4" id="meetup-info">
-      <div class="card-body">
-        <h2 class="subtitle-dopamine mb-3">活动信息</h2>
-        <div class="content-section">
-          <p>正在加载活动信息...</p>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <div class="logo-section">
+        <div class="logo">
+          <img src="logo.svg" alt="聚友圈Logo" width="40" height="40">
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-name">聚友圈</h1>
+          <p class="brand-slogan">连接每一个精彩瞬间</p>
         </div>
       </div>
+      <nav class="header-nav">
+        <a href="/" class="nav-link">首页</a>
+        <a href="new-meetup" class="nav-link">发起活动</a>
+        <a href="meetup-manage" class="nav-link active">管理</a>
+      </nav>
+    </div>
+  </header>
+  <div class="container">
+    <!-- Token输入界面 -->
+    <div id="token-input-section" style="display: none;">
+      <!-- <div class="card-body"> -->
+      <!-- <h2 class="subtitle-dopamine mb-3">活动管理</h2> -->
+      <div class="content-section">
+        <p class="mb-3">请输入管理令牌以访问活动管理页面：</p>
+        <div class="input-group mb-3">
+          <input type="text" id="token-input" class="form-control" placeholder="请输入管理令牌" />
+          <button class="btn btn-dopamine" id="token-submit-btn">进入管理页</button>
+        </div>
+        <div class="status-message mt-3" id="token-status"></div>
+        <p class="text-muted mt-3">管理令牌可以在创建活动时获得，或者通过活动详情页面的管理链接访问。</p>
+      </div>
+      <!-- </div> -->
     </div>
 
-    <div class="card mb-4" id="qr-manage">
-      <div class="card-body">
-        <h2 class="subtitle-dopamine mb-3">微信群二维码管理</h2>
-        <div class="content-section">
-          <div class="qr-current mb-3" id="qr-current">
-            <img id="current-qr-img" src="" alt="当前二维码" style="display: none;">
-            <div class="qr-info">
-              <p><strong>当前二维码状态：</strong><span id="qr-status">加载中...</span></p>
-              <p class="text-muted">二维码会定期过期，请及时更新以确保新成员能够加入微信群。</p>
+    <!-- 管理内容区域 -->
+    <div id="management-content" style="display: none;">
+      <div class="card mb-4" id="meetup-info">
+        <div class="card-body">
+          <h2 class="subtitle-dopamine mb-3">活动信息</h2>
+          <div class="content-section">
+            <p>正在加载活动信息...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4" id="qr-manage">
+        <div class="card-body">
+          <h2 class="subtitle-dopamine mb-3">更新微信群二维码</h2>
+          <div class="content-section">
+            <div class="qr-current mb-3" id="qr-current">
+              <img id="current-qr-img" src="" alt="当前二维码" style="display: none;">
+              <div class="qr-info">
+                <p><strong>当前二维码状态：</strong><span id="qr-status">加载中...</span></p>
+                <p class="text-muted">二维码会定期过期，请及时更新以确保新成员能够加入微信群。</p>
+              </div>
+            </div>
+
+            <div class="qr-upload mt-3">
+              <h3 class="mb-3">上传新的二维码</h3>
+              <input type="file" id="qr-file-input" accept="image/*" class="mb-3" />
+              <img id="qr-preview" class="qr-preview mb-3" style="display: none;" />
+              <button class="btn btn-dopamine" id="update-qr-btn" disabled>更新二维码</button>
+              <div class="status-message mt-3" id="update-status"></div>
             </div>
           </div>
-
-          <div class="qr-upload mt-3">
-            <h3 class="mb-3">上传新的二维码</h3>
-            <input type="file" id="qr-file-input" accept="image/*" class="mb-3" />
-            <img id="qr-preview" class="qr-preview mb-3" style="display: none;" />
-            <button class="btn btn-dopamine" id="update-qr-btn" disabled>更新二维码</button>
-            <div class="status-message mt-3" id="update-status"></div>
-          </div>
         </div>
       </div>
-    </div>
 
-    <div class="card" id="rsvp-info">
-      <div class="card-body">
-        <h2 class="subtitle-dopamine mb-3">参与者列表</h2>
-        <div class="content-section">
-          <p>加载中...</p>
+      <div class="card" id="rsvp-info">
+        <div class="card-body">
+          <h2 class="subtitle-dopamine mb-3">参与者列表</h2>
+          <div class="content-section">
+            <p>加载中...</p>
+          </div>
         </div>
       </div>
     </div>
@@ -373,9 +449,20 @@
     async function loadMeetupData() {
       const token = new URLSearchParams(window.location.search).get("token");
       if (!token) {
-        document.getElementById("meetup-info").innerHTML = "❌ 缺少 token 参数。";
+        // 显示token输入界面
+        document.getElementById("token-input-section").style.display = "block";
+        document.getElementById("management-content").style.display = "none";
         return;
       }
+
+      // 有token时显示管理内容
+      document.getElementById("token-input-section").style.display = "none";
+      document.getElementById("management-content").style.display = "block";
+
+      await loadMeetupWithToken(token);
+    }
+
+    async function loadMeetupWithToken(token) {
 
       try {
         // 使用缓存API获取活动详情
@@ -560,8 +647,6 @@
       }
     }
 
-    loadMeetupData();
-
     // QR Code management functions
     function displayCurrentQRCode(qrcode) {
       const qrImg = document.getElementById('current-qr-img');
@@ -612,7 +697,7 @@
 
         try {
           const { apiWithCache } = await import('./scripts/apiWithCache.js');
-          
+
           // First upload the image
           const uploadResult = await apiWithCache.uploadImageToGitHub({ base64Image: qrcodeBase64 });
 
@@ -623,7 +708,7 @@
           const qrcodeUrl = uploadResult.url;
 
           // Then update the meetup with new QR code URL
-          const updateResult = await apiWithCache.updateMeetup({ token, qrcode: qrcodeUrl });
+          const updateResult = await apiWithCache.updateMeetup(token, { qrcode: qrcodeUrl });
 
           if (!updateResult.success) {
             throw new Error(updateResult.error || '二维码更新失败');
@@ -707,8 +792,7 @@
           const datetimeWithTimezone = TimeUtils.createDateTimeObject(datetime);
 
           const { apiWithCache } = await import('./scripts/apiWithCache.js');
-          const result = await apiWithCache.updateMeetup({
-            token,
+          const result = await apiWithCache.updateMeetup(token, {
             title,
             datetime: datetimeWithTimezone,
             location,
@@ -780,10 +864,70 @@
       document.getElementById(tabName + '-pane').classList.add('active');
     }
 
+    // Make switchTab available globally
+    window.switchTab = switchTab;
+
+    // Token输入处理
+    function handleTokenSubmit() {
+      const tokenInput = document.getElementById('token-input');
+      const token = tokenInput.value.trim();
+
+      if (!token) {
+        showTokenStatus('请输入管理令牌', 'error');
+        return;
+      }
+
+      // 更新URL并重新加载页面
+      const newUrl = new URL(window.location);
+      newUrl.searchParams.set('token', token);
+      window.location.href = newUrl.toString();
+    }
+
+    function showTokenStatus(message, type) {
+      const statusDiv = document.getElementById('token-status');
+      statusDiv.textContent = message;
+      statusDiv.className = `status-message mt-3 ${type}`;
+    }
+
+    // 页面加载完成后设置事件监听器
+    document.addEventListener('DOMContentLoaded', function () {
+      // Token输入按钮事件
+      const tokenSubmitBtn = document.getElementById('token-submit-btn');
+      if (tokenSubmitBtn) {
+        tokenSubmitBtn.addEventListener('click', handleTokenSubmit);
+      }
+
+      // Token输入框回车事件
+      const tokenInput = document.getElementById('token-input');
+      if (tokenInput) {
+        tokenInput.addEventListener('keypress', function (e) {
+          if (e.key === 'Enter') {
+            handleTokenSubmit();
+          }
+        });
+      }
+
+      // 加载活动数据
+      loadMeetupData();
+    });
+
   </script>
 
   <!-- 悬浮新建活动按钮 -->
   <a href="new-meetup" class="floating-new-meetup" title="点击发起活动">+</a>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-simple">
+        <div class="footer-logo">
+          <img src="logo.svg" alt="聚友圈Logo" width="24" height="24">
+          <span class="footer-brand">聚友圈</span>
+        </div>
+        <p class="footer-text">&copy; 2025 聚友圈 - 连接每一个精彩瞬间</p>
+      </div>
+    </div>
+  </footer>
 
 </body>
 

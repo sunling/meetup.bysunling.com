@@ -12,11 +12,35 @@
       padding: 0;
       background: linear-gradient(135deg, #f8f9fa 0%, #e9f1ea 100%);
       color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
+    
+    /* Page specific styles */
+    
     .container {
       max-width: 800px;
       margin: 0 auto;
       padding: 2em 1.5em;
+      flex: 1;
+    }
+    
+    .page-title {
+      font-size: 1.8rem;
+      margin-bottom: 0.5em;
+      background: linear-gradient(135deg, #ff6b9d 0%, #ffa726 50%, #42a5f5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 600;
+    }
+    
+    /* Responsive Design for page specific elements */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1em;
+      }
     }
     h1 {
       font-size: 2em;
@@ -52,10 +76,41 @@
 
     .date-groups {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5em;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2em;
       margin-bottom: 2em;
+      /* 突破container的宽度限制并居中显示 */
+      position: relative;
+      left: 50%;
+      right: 50%;
+      margin-left: -50vw;
+      margin-right: -50vw;
+      width: 100vw;
+      max-width: 1240px;
+      margin-left: calc(-50vw + (100vw - min(1240px, 100vw)) / 2);
+      margin-right: calc(-50vw + (100vw - min(1240px, 100vw)) / 2);
+      padding: 0 3rem;
+      box-sizing: border-box;
     }
+    
+    @media (min-width: 1200px) {
+      .date-groups {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    @media (min-width: 900px) and (max-width: 1199px) {
+      .date-groups {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 768px) {
+       .date-groups {
+         grid-template-columns: 1fr;
+         padding: 0 1rem;
+       }
+     }
     .date-group {
       background: #fff;
       border-radius: 12px;
@@ -125,7 +180,22 @@
     }
     .event-details {
       margin-top: 2em;
+      /* 突破container的宽度限制，占据整个页面宽度 */
+      position: relative;
+      left: 50%;
+      right: 50%;
+      margin-left: -50vw;
+      margin-right: -50vw;
+      width: 100vw;
+      padding: 2em;
+      box-sizing: border-box;
     }
+    .event-details-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    
     .event-details-header {
       display: flex;
       justify-content: space-between;
@@ -229,20 +299,58 @@
   </style>
 </head>
 <body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <div class="logo-section">
+        <div class="logo">
+          <img src="logo.svg" alt="聚友圈Logo" width="40" height="40">
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-name">聚友圈</h1>
+          <p class="brand-slogan">连接每一个精彩瞬间</p>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <a href="/" class="nav-link active">首页</a>
+        <a href="new-meetup" class="nav-link">发起活动</a>
+        <a href="meetup-manage" class="nav-link">管理</a>
+      </nav>
+    </div>
+  </header>
+
   <div class="container">
-    <!-- <h1 class="title-dopamine">所有活动</h1> -->
+    <!-- <div style="text-align: center; margin-bottom: 2em;">
+      <h2 class="page-title">发现身边的精彩活动</h2>
+      <p style="color: #666; font-size: 1.1em; margin-bottom: 0;">与志同道合的朋友一起，创造美好回忆</p>
+    </div> -->
     <div id="date-groups" class="date-groups">
       <div class="loading">加载中...</div>
     </div>
 
     <div id="event-details" class="event-details" style="display: none;">
-      <div class="event-details-header">
-        <h3 id="selected-date-title"></h3>
-        <a href="/" class="home-link" onclick="showDateGroups(); return false;">回到首页</a>
+      <div class="event-details-content">
+        <div class="event-details-header">
+          <h3 id="selected-date-title"></h3>
+          <!-- <a href="#" class="home-link" onclick="showDateGroups(); return false;">← 返回列表</a> -->
+        </div>
+        <div class="event-list" id="selected-date-events"></div>
       </div>
-      <div class="event-list" id="selected-date-events"></div>
     </div>
   </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-simple">
+        <div class="footer-logo">
+          <img src="logo.svg" alt="聚友圈Logo" width="24" height="24">
+          <span class="footer-brand">聚友圈</span>
+        </div>
+        <p class="footer-text">&copy; 2025 聚友圈 - 连接每一个精彩瞬间</p>
+      </div>
+    </div>
+  </footer>
 
   <!-- 悬浮新建活动按钮 -->
   <a href="new-meetup" class="floating-new-meetup" title="点击发起活动">+</a>
@@ -442,7 +550,25 @@
       const container = document.getElementById('date-groups');
       
       if (dateGroups.length === 0) {
-        container.innerHTML = '<div class="loading">暂无活动</div>';
+        container.innerHTML = `
+          <div style="text-align: center; padding: 3em 2em; color: #666;">
+            <h3 style="margin-bottom: 1em; color: #333;">暂时还没有活动</h3>
+            <p style="margin-bottom: 1.5em; line-height: 1.6;">成为第一个发起活动的人吧！<br>分享你的兴趣爱好，邀请大家一起参与</p>
+            <a href="new-meetup" style="
+              display: inline-block;
+              background: linear-gradient(135deg, #ff6b9d 0%, #ffa726 50%, #42a5f5 100%);
+              color: white;
+              text-decoration: none;
+              padding: 0.8em 2em;
+              border-radius: 25px;
+              font-weight: 500;
+              transition: all 0.3s ease;
+              box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255, 107, 157, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255, 107, 157, 0.3)'">
+              +
+            </a>
+          </div>
+        `;
         return;
       }
       
