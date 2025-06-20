@@ -9,7 +9,7 @@ class CacheManager {
         this.defaultTTL = 5 * 60 * 1000; // 5分钟默认过期时间
         this.config = {
             // 不同数据类型的缓存配置
-            meetups: { ttl: 5 * 60 * 1000, storage: 'localStorage' }, // 2分钟，活动列表变化较频繁
+            meetups: { ttl: 1 * 60 * 1000, storage: 'localStorage' }, // 1分钟，活动列表变化较频繁
             meetupDetails: { ttl: 5 * 60 * 1000, storage: 'localStorage' }, // 5分钟，详情相对稳定
             rsvpCounts: { ttl: 1 * 60 * 1000, storage: 'memory' }, // 1分钟，报名数据变化频繁
             userRsvp: { ttl: 10 * 60 * 1000, storage: 'localStorage' }, // 10分钟，用户报名状态
