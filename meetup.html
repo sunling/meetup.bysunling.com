@@ -20,41 +20,46 @@
     }
 
     .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 0 1rem;
-      flex: 1;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0 2rem;
+      box-sizing: border-box;
     }
 
     /* 页面头部样式已在后面统一定义 */
 
-    /* --- 主布局 (左右分栏) --- */
+    /* --- 主布局 (单一容器布局) --- */
     .main-layout {
-      display: flex;
-      flex-wrap: wrap;
+      display: block;
       padding: 20px 0;
+      width: 100%;
     }
 
-    main {
-      flex: 1;
-      min-width: 60%;
-      margin-right: 2rem;
+    .content-box {
       background: var(--bg-card);
       border-radius: var(--radius-lg);
       padding: 2rem;
       box-shadow: var(--shadow-md);
       border: 1px solid var(--border-color);
+      width: 70%;
+      margin: 0 auto;
+      box-sizing: border-box;
     }
 
-    aside {
-      flex-basis: 300px;
-      flex-shrink: 0;
-      background: var(--bg-card);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem;
-      box-shadow: var(--shadow-md);
-      border: 1px solid var(--border-color);
-      height: fit-content;
+    .event-header {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .event-content {
+      margin-bottom: 2rem;
+    }
+
+    /* 隐藏原来的main和aside */
+    main, aside {
+      display: none;
     }
 
     /* --- 左侧内容区 --- */
@@ -145,24 +150,6 @@
       margin-bottom: 10px;
       transition: all 0.2s ease;
     }
-
-    /* .going-button {
-      color: #666;
-      border-color: #FFB6C1;
-      background: linear-gradient(135deg, rgba(255, 182, 193, 0.2), rgba(255, 228, 225, 0.2));
-    } */
-
-    /* .going-button:hover {
-      background: linear-gradient(135deg, rgba(255, 182, 193, 0.3), rgba(255, 228, 225, 0.3));
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(255, 182, 193, 0.3);
-    }
-
-    .maybe-button {
-      color: #666;
-      border-color: #F0E68C;
-      background: linear-gradient(135deg, rgba(240, 230, 140, 0.2), rgba(255, 228, 225, 0.2));
-    } */
 
     #cancel-rsvp-button:hover {
       background: #eeeeee !important;
@@ -473,21 +460,27 @@
       }
 
       .main-layout {
-        flex-direction: column;
+        padding: 10px 0;
       }
 
-      main {
-        margin-right: 0;
-        margin-bottom: 1.5rem;
+      .content-box {
         padding: 1.5rem;
+        margin: 0;
+        width: 100%;
       }
 
-      aside {
-        padding: 1rem;
+      .event-header {
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
       }
 
-      .main-layout {
-        padding: 20px 1rem;
+      .event-content {
+        margin-bottom: 1.5rem;
+      }
+
+      .event-actions {
+        padding-top: 1rem;
+        margin-top: 1.5rem;
       }
 
       .page-header {
@@ -545,27 +538,24 @@
   <div class="container">
 
     <div class="main-layout">
-      <main>
-        <div class="page-header">
-          <h1 id="meetup-title" class="title-dopamine">活动详情</h1>
-        </div>
-        <article>
+      <div class="content-box">
+        <!-- 活动标题和基本信息 -->
+        <div class="event-header">
+          <div class="page-header">
+            <h1 id="meetup-title" class="title-dopamine">活动标题</h1>
+          </div>
+          <div id="meetup-meta" class="event-meta">
+            <p>正在加载...</p>
+          </div>
           <div id="meetup-description" class="event-description">
             <p>正在加载活动信息...</p>
           </div>
-        </article>
-      </main>
+        </div>
 
-      <aside>
-        <div class="info-card">
-          <div class="info-item">
-            <h3>活动信息</h3>
-            <div id="meetup-meta" class="event-meta">
-              <p>正在加载...</p>
-            </div>
-          </div>
-
+        <!-- 报名和参与者信息 -->
+        <div class="event-actions">
           <div class="rsvp-section" id="rsvp-section" style="display:none">
+            <h3>参与活动</h3>
             <button class="btn btn-primary" id="going-button" style="display:none">
               ✓ 确定参加
             </button>
@@ -599,17 +589,18 @@
               style="display:none; background: #f5f5f5 !important; color: #666 !important; border: 1px solid #ddd !important;">
               取消我的报名
             </button>
+
+            <div id="rsvp-status" class="rsvp-status"></div>
           </div>
 
           <div class="info-item attendees" id="attendees-section" style="display:none">
             <h3 id="attendees-title">已有 0 位朋友报名</h3>
-            <div id="rsvp-status" class="rsvp-status"></div>
             <div class="attendee-avatars" id="attendee-avatars">
               <!-- Attendee avatars will be populated by JavaScript -->
             </div>
           </div>
         </div>
-      </aside>
+      </div>
     </div>
 
     <!-- QR Code Section -->
