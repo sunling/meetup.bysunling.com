@@ -428,9 +428,31 @@
         groups[dateKey].events.push(event);
       });
       
-      // 按日期排序（倒序，最新的日期在前）
+      // 按日期排序：将来的活动正序（最早在前），过去的活动倒序（最新在前）
+      const now = new Date();
+      
       return Object.keys(groups)
-        .sort((a, b) => new Date(b) - new Date(a))
+        .sort((a, b) => {
+          const dateA = new Date(a);
+          const dateB = new Date(b);
+          
+          // 检查每个日期组中是否还有未来的活动（考虑具体时间）
+          const hasAFutureEvents = groups[a].events.some(event => new Date(event.datetime) > now);
+          const hasBFutureEvents = groups[b].events.some(event => new Date(event.datetime) > now);
+          
+          // 如果两个日期组都有将来的活动，按正序排列（早的在前）
+          if (hasAFutureEvents && hasBFutureEvents) {
+            return dateA - dateB;
+          }
+          // 如果两个日期组都没有将来的活动（都是过去的），按倒序排列（新的在前）
+          else if (!hasAFutureEvents && !hasBFutureEvents) {
+            return dateB - dateA;
+          }
+          // 如果一个有将来活动一个没有，将来活动排在前面，过去活动排在后面
+          else {
+            return hasAFutureEvents ? -1 : 1;
+          }
+        })
         .map(key => groups[key]);
     }
     
@@ -492,9 +514,10 @@
     }
     
     function formatDateForDisplay(date) {
+      const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
-      return `${month}月${day}日`;
+      return `${year}年${month}月${day}日`;
     }
     
     // 修改 displayDateGroups 函数以保存数据
