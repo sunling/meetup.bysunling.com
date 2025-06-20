@@ -7,20 +7,6 @@
   <title>活动详情</title>
   <link rel="stylesheet" href="./styles/shared.css">
   <style>
-    :root {
-      --primary-color: #5f9b65;
-      --primary-light: #7ab17f;
-      --secondary-color: #f0b660;
-      --text-color: #333333;
-      --light-text: #666666;
-      --bg-color: #f8f9fa;
-      --card-bg: #ffffff;
-      --border-color: #e6e6e6;
-      --maybe-color: #f0b660;
-      --going-color: #e17a0b;
-      --cant-go-color: #aaaaaa;
-    }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       margin: 0;
@@ -29,12 +15,15 @@
       color: var(--text-color);
       line-height: 1.6;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     .container {
       max-width: 1000px;
       margin: 0 auto;
       padding: 0 1rem;
+      flex: 1;
     }
 
     /* 页面头部样式已在后面统一定义 */
@@ -157,13 +146,13 @@
       transition: all 0.2s ease;
     }
 
-    .going-button {
+    /* .going-button {
       color: #666;
       border-color: #FFB6C1;
       background: linear-gradient(135deg, rgba(255, 182, 193, 0.2), rgba(255, 228, 225, 0.2));
-    }
+    } */
 
-    .going-button:hover {
+    /* .going-button:hover {
       background: linear-gradient(135deg, rgba(255, 182, 193, 0.3), rgba(255, 228, 225, 0.3));
       transform: translateY(-1px);
       box-shadow: 0 2px 8px rgba(255, 182, 193, 0.3);
@@ -173,7 +162,7 @@
       color: #666;
       border-color: #F0E68C;
       background: linear-gradient(135deg, rgba(240, 230, 140, 0.2), rgba(255, 228, 225, 0.2));
-    }
+    } */
 
     #cancel-rsvp-button:hover {
       background: #eeeeee !important;
@@ -536,7 +525,7 @@
   <!-- Header -->
   <header class="site-header">
     <div class="header-container">
-      <div class="logo-section">
+      <a href="/" class="logo-section">
         <div class="logo">
           <img src="logo.svg" alt="聚友圈Logo" width="40" height="40">
         </div>
@@ -544,7 +533,7 @@
           <h1 class="brand-name">聚友圈</h1>
           <p class="brand-slogan">连接每一个精彩瞬间</p>
         </div>
-      </div>
+      </a>
       <nav class="header-nav">
         <a href="/" class="nav-link">首页</a>
         <a href="new-meetup" class="nav-link">发起活动</a>
@@ -586,7 +575,7 @@
             </button>
 
             <div class="rsvp-buttons" id="rsvp-buttons">
-              <div class="rsvp-button going-button" id="going-button-small">
+              <div class="rsvp-button btn-primary" id="going-button-small">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -595,7 +584,7 @@
                 确定参加
               </div>
 
-              <div class="rsvp-button maybe-button" id="maybe-button-small">
+              <div class="rsvp-button" id="maybe-button-small">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="10"></circle>
@@ -642,7 +631,7 @@
   </div>
 
   <!-- 悬浮新建活动按钮 -->
-  <a href="new-meetup" class="floating-new-meetup" title="点击发起活动">+</a>
+  <!-- <a href="new-meetup" class="floating-new-meetup" title="点击发起活动">+</a> -->
 
   <!-- RSVP Dialog -->
   <div class="dialog-overlay" id="rsvp-dialog">
@@ -1244,7 +1233,7 @@
   </script>
 
   <!-- 悬浮新建活动按钮 -->
-  <a href="new-meetup" class="floating-new-meetup" title="发起新活动">+</a>
+  <!-- <a href="new-meetup" class="floating-new-meetup" title="发起新活动">+</a> -->
 
   <!-- Footer -->
   <footer class="site-footer">

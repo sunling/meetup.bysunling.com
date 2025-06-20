@@ -72,17 +72,17 @@
     /* 内容区域样式 */
     .content-section {
       background: var(--bg-card);
-      border-radius: var(--radius-lg);
+      /* border-radius: var(--radius-lg); */
       padding: 1.5rem;
-      border: 1px solid rgba(255, 107, 157, 0.15);
-      box-shadow: var(--shadow-md);
+      /* border: 1px solid rgba(255, 107, 157, 0.15); */
+      /* box-shadow: var(--shadow-md); */
       backdrop-filter: blur(10px);
     }
 
-    .content-section:hover {
+    /* .content-section:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow-lg);
-    }
+    } */
 
     /* 链接框样式 */
     .link-box {
@@ -367,7 +367,7 @@
   <!-- Header -->
   <header class="site-header">
     <div class="header-container">
-      <div class="logo-section">
+      <a href="/" class="logo-section">
         <div class="logo">
           <img src="logo.svg" alt="聚友圈Logo" width="40" height="40">
         </div>
@@ -375,7 +375,7 @@
           <h1 class="brand-name">聚友圈</h1>
           <p class="brand-slogan">连接每一个精彩瞬间</p>
         </div>
-      </div>
+      </a>
       <nav class="header-nav">
         <a href="/" class="nav-link">首页</a>
         <a href="new-meetup" class="nav-link">发起活动</a>
@@ -427,7 +427,7 @@
               <h3 class="mb-3">上传新的二维码</h3>
               <input type="file" id="qr-file-input" accept="image/*" class="mb-3" />
               <img id="qr-preview" class="qr-preview mb-3" style="display: none;" />
-              <button class="btn btn-dopamine" id="update-qr-btn" disabled>更新二维码</button>
+              <button class="btn btn-dopamine" id="update-qr-btn" disabled style="display: block; margin: 0 auto;">更新二维码</button>
               <div class="status-message mt-3" id="update-status"></div>
             </div>
           </div>
@@ -483,20 +483,18 @@
                 <p><strong>时间：</strong> <span id="display-datetime">${formatDateTime(meetup.datetime)}</span></p>
                 <p><strong>地点：</strong> <span id="display-location">${meetup.location}</span></p>
                 <p><strong>发起人微信号：</strong> ${meetup.wechat_id}</p>
+                <p><strong>活动内容：</strong> ${meetup.description}</p>
+                <p><strong>活动报名链接：</strong> <span id="display-signup-url">${publicUrl}</span> 
+                  <button class="btn btn-secondary btn-sm" id="copy-signup-button" style="margin-left: 8px; padding: 2px 8px; font-size: 12px;">
+                    复制
+                    </button>
+                </p>
+                <p><strong>管理令牌（<span style="color: #dc3545; font-weight: bold;" title="管理令牌用于管理活动，请勿泄露给他人，建议保存在安全的地方">请妥善保管</span>）：</strong> <span id="display-token">${token}</span> 
+                  <button class="btn btn-secondary btn-sm" id="copy-token-button" style="margin-left: 8px; padding: 2px 8px; font-size: 12px;">
+                    复制
+                  </button>
+                </p>
               </div>
-              <div class="meetup-description mb-4" id="display-description">${meetup.description}</div>
-              
-              <div class="link-box mb-3">
-                <span class="link-label">管理页面链接（请记得<span style="color: red;">保存</span>）：</span>
-                <input type="text" value="${window.location.href}" readonly onclick="this.select()">
-                <button class="btn btn-secondary" id="copy-manage-button">复制</button>
-              </div>
-              <div class="link-box mb-3">
-                <span class="link-label">活动报名链接：</span>
-                <input type="text" value="${publicUrl}" readonly onclick="this.select()">
-                <button class="btn btn-secondary" id="copy-signup-button">复制</button>
-              </div>
-              
               <div class="text-center">
                 <button class="btn btn-dopamine" id="edit-button">编辑活动信息</button>
               </div>
@@ -538,35 +536,32 @@
         // Initialize edit functionality
         initEditFunctionality(token, meetup);
 
-        // Add copy management link functionality
-        document.getElementById("copy-manage-button").addEventListener("click", async () => {
-          const button = document.getElementById("copy-manage-button");
-          const input = button.parentElement.querySelector('input');
-          if (input) {
-            input.select();
+        // Add copy token functionality
+        document.getElementById("copy-token-button").addEventListener("click", async () => {
+          const button = document.getElementById("copy-token-button");
+          const span = document.getElementById("display-token");
+          if (span) {
             try {
-              await navigator.clipboard.writeText(input.value);
-              button.textContent = "已复制";
+              await navigator.clipboard.writeText(span.textContent);
+              button.textContent = "✅ 已复制";
               setTimeout(() => {
-                button.textContent = "复制管理链接";
+                button.textContent = "复制";
               }, 2000);
             } catch (err) {
               alert("复制失败，请手动复制");
             }
           }
         });
-
         // Add copy signup link functionality
         document.getElementById("copy-signup-button").addEventListener("click", async () => {
           const button = document.getElementById("copy-signup-button");
-          const input = button.parentElement.querySelector('input');
-          if (input) {
-            input.select();
+          const span = document.getElementById("display-signup-url");
+          if (span) {
             try {
-              await navigator.clipboard.writeText(input.value);
+              await navigator.clipboard.writeText(span.textContent);
               button.textContent = "✅ 已复制";
               setTimeout(() => {
-                button.textContent = "复制报名链接";
+                button.textContent = "复制";
               }, 2000);
             } catch (err) {
               alert("复制失败，请手动复制");
@@ -914,7 +909,7 @@
   </script>
 
   <!-- 悬浮新建活动按钮 -->
-  <a href="new-meetup" class="floating-new-meetup" title="点击发起活动">+</a>
+  <!-- <a href="new-meetup" class="floating-new-meetup" title="点击发起活动">+</a> -->
 
   <!-- Footer -->
   <footer class="site-footer">

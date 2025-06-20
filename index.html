@@ -302,7 +302,7 @@
   <!-- Header -->
   <header class="site-header">
     <div class="header-container">
-      <div class="logo-section">
+      <a href="/" class="logo-section">
         <div class="logo">
           <img src="logo.svg" alt="聚友圈Logo" width="40" height="40">
         </div>
@@ -310,7 +310,7 @@
           <h1 class="brand-name">聚友圈</h1>
           <p class="brand-slogan">连接每一个精彩瞬间</p>
         </div>
-      </div>
+      </a>
       <nav class="header-nav">
         <a href="/" class="nav-link active">首页</a>
         <a href="new-meetup" class="nav-link">发起活动</a>
@@ -385,54 +385,6 @@
       return { past, today_events, future };
     }
     
-    function createEventCard(meetup) {
-      const item = document.createElement('a');
-      item.className = 'event-card';
-      item.href = `meetup?id=${meetup.id}`;
-      const dateText = new Date(meetup.datetime).toLocaleString("zh-CN");
-      const rsvpCount = meetup.rsvp_count || 0;
-      item.innerHTML = `
-        <div class="event-title">${meetup.title}</div>
-        <div class="event-meta">📅 ${dateText} | 📍 ${meetup.location} | 👥 ${rsvpCount}人参与</div>
-        <div>${(meetup.description || '').slice(0, 60)}...</div>
-      `;
-      return item;
-    }
-    
-    function renderEventsByCategory(categorized) {
-      const pastContainer = document.getElementById('past-list');
-      const todayContainer = document.getElementById('today-list');
-      const futureContainer = document.getElementById('future-list');
-      
-      // Clear containers
-      pastContainer.innerHTML = '';
-      todayContainer.innerHTML = '';
-      futureContainer.innerHTML = '';
-      
-      // Render past events (newest first)
-      categorized.past.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
-      categorized.past.forEach(meetup => {
-        pastContainer.appendChild(createEventCard(meetup));
-      });
-      
-      // Render today's events (earliest first)
-      categorized.today_events.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
-      categorized.today_events.forEach(meetup => {
-        todayContainer.appendChild(createEventCard(meetup));
-      });
-      
-      // Render future events (earliest first)
-      categorized.future.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
-      categorized.future.forEach(meetup => {
-        futureContainer.appendChild(createEventCard(meetup));
-      });
-      
-      // Hide sections with no events
-      document.getElementById('past-events').style.display = categorized.past.length > 0 ? 'block' : 'none';
-      document.getElementById('today-events').style.display = categorized.today_events.length > 0 ? 'block' : 'none';
-      document.getElementById('future-events').style.display = categorized.future.length > 0 ? 'block' : 'none';
-    }
-
     async function loadEvents() {
       try {
         // 使用缓存API获取活动列表
@@ -507,12 +459,12 @@
         });
         
         return `
-          <div class="event-card">
+          <div class="event-card" onclick="window.location.href='meetup?id=${event.id}'" style="cursor: pointer;">
             <div class="event-time">${time}</div>
-            <div class="event-title"><a href="meetup?id=${event.id}" style="text-decoration: none; color: inherit;">${event.title}</a></div>
+            <div class="event-title">${event.title}</div>
             <div class="event-description">${event.description || ''}</div>
             <div class="event-location">${event.location || ''}</div>
-            <div class="event-actions">
+            <div class="event-actions" onclick="event.stopPropagation();">
               <button class="btn-interested" onclick="goToMeetup(${event.id}, 'maybe')">感兴趣</button>
               <button class="btn-confirm" onclick="goToMeetup(${event.id}, 'going')">确定参加</button>
             </div>
