@@ -6,27 +6,70 @@
  * @returns {string} UTC时间戳字符串 (ISO格式)
  */
 function formatDateTimeForStorage(datetime) {
-  if (typeof datetime === 'object' && datetime.localTime && datetime.timezone) {
-    // 将用户的本地时间转换为UTC时间
-    const localTime = datetime.localTime + ':00'; // 添加秒数
+  if (typeof datetime === 'object' && datetime !== null && datetime.localTime) {
+    const timezone = datetime.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
     
-    // 创建日期对象来获取用户时区的偏移量
-    const tempDate = new Date(localTime);
-    const userTimezoneOffset = -tempDate.getTimezoneOffset(); // getTimezoneOffset返回负值表示正偏移
-    const offsetHours = Math.floor(Math.abs(userTimezoneOffset) / 60);
-    const offsetMinutes = Math.abs(userTimezoneOffset) % 60;
-    const offsetSign = userTimezoneOffset >= 0 ? '+' : '-';
-    const offsetString = `${offsetSign}${offsetHours.toString().padStart(2, '0')}:${offsetMinutes.toString().padStart(2, '0')}`;
-    
-    // 先创建带时区的时间字符串，然后转换为UTC
-    const timeWithTimezone = localTime + offsetString;
-    const utcDate = new Date(timeWithTimezone);
-    
-    // 返回UTC时间的ISO字符串格式
-    return utcDate.toISOString();
+    try {
+      const localTimeStr = datetime.localTime;
+      
+      // 验证时间格式
+      if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(localTimeStr)) {
+        throw new Error(`Invalid local time format: ${localTimeStr}`);
+      }
+      
+      // 使用正确的方法：将本地时间字符串当作指定时区的时间来解析
+      // 方法：创建一个假设的UTC时间，然后通过时区转换找到真正的UTC时间
+      
+      const [datePart, timePart] = localTimeStr.split('T');
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hour, minute] = timePart.split(':').map(Number);
+      
+      // 创建两个时间点来计算偏移量
+      // 1. 假设这个时间就是UTC时间
+      const assumedUtc = new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
+      
+      // 2. 看看这个UTC时间在目标时区显示为什么时间
+      const formatter = new Intl.DateTimeFormat('sv-SE', {
+        timeZone: timezone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      
+      const timeInTargetZone = formatter.format(assumedUtc);
+      const targetDate = new Date(timeInTargetZone + 'Z'); // 当作UTC解析
+      
+      // 3. 计算偏移量并应用
+      const offset = assumedUtc.getTime() - targetDate.getTime();
+      const correctUtc = new Date(assumedUtc.getTime() + offset);
+      
+      console.log(`Local time: ${localTimeStr} in ${timezone}`);
+      console.log(`Assumed UTC: ${assumedUtc.toISOString()}`);
+      console.log(`Time in target zone: ${timeInTargetZone}`);
+      console.log(`Offset: ${offset / 60000} minutes`);
+      console.log(`Correct UTC: ${correctUtc.toISOString()}`);
+      
+      return correctUtc.toISOString();
+      
+    } catch (error) {
+      console.error('Error converting datetime:', error);
+      throw new Error(`Failed to convert datetime: ${error.message}`);
+    }
   } else {
     // 旧格式的回退处理: 当作本地时间处理，转换为UTC
-    return new Date(datetime).toISOString();
+    try {
+      const date = new Date(datetime);
+      if (isNaN(date.getTime())) {
+        throw new Error(`Invalid datetime value: ${datetime}`);
+      }
+      return date.toISOString();
+    } catch (error) {
+      console.error('Error in formatDateTimeForStorage:', error);
+      throw new Error(`Invalid datetime format: ${datetime}`);
+    }
   }
 }
 
@@ -37,22 +80,22 @@ function formatDateTimeForStorage(datetime) {
  */
 function formatDateTimeForDisplay(datetimeString) {
   if (!datetimeString) return '';
-  
+
   const date = new Date(datetimeString);
-  
+
   // 获取本地时间格式
   const localDateString = date.toLocaleDateString('zh-CN', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit'
   });
-  
+
   const localTimeString = date.toLocaleTimeString('zh-CN', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false
   });
-  
+
   return `${localDateString} ${localTimeString}`;
 }
 
@@ -63,16 +106,16 @@ function formatDateTimeForDisplay(datetimeString) {
  */
 function formatDateTimeForInput(datetimeString) {
   if (!datetimeString) return '';
-  
+
   const date = new Date(datetimeString);
-  
+
   // 手动构造 YYYY-MM-DDTHH:mm 格式
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const day = date.getDate().toString().padStart(2, '0');
   const hours = date.getHours().toString().padStart(2, '0');
   const minutes = date.getMinutes().toString().padStart(2, '0');
-  
+
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
@@ -103,12 +146,12 @@ function createDateTimeObject(localTimeString) {
  */
 function getLocalDateKey(datetimeString) {
   const date = new Date(datetimeString);
-  
+
   // 使用本地时间而不是UTC时间来生成日期键
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
-  
+
   return `${year}-${month}-${day}`;
 }
 

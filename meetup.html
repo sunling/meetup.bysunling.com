@@ -58,7 +58,8 @@
     }
 
     /* 隐藏原来的main和aside */
-    main, aside {
+    main,
+    aside {
       display: none;
     }
 
@@ -71,7 +72,7 @@
     .event-meta-item {
       display: flex;
       align-items: center;
-      margin-bottom: 0.8em;
+      margin-bottom: 0.4em;
       color: var(--light-text);
       font-size: 1em;
     }
@@ -544,12 +545,13 @@
           <div class="page-header">
             <h1 id="meetup-title" class="title-dopamine">活动标题</h1>
           </div>
-          <div id="meetup-meta" class="event-meta">
-            <p>正在加载...</p>
-          </div>
           <div id="meetup-description" class="event-description">
             <p>正在加载活动信息...</p>
           </div>
+          <div id="meetup-meta" class="event-meta">
+            <p>正在加载...</p>
+          </div>
+          
         </div>
 
         <!-- 报名和参与者信息 -->
@@ -616,7 +618,7 @@
     </div>
 
     <div class="share-section" style="padding: 20px 40px; border-top: 1px solid #e0e0e0;">
-      <button id="share-button" class="btn btn-secondary" style="max-width: 300px; margin: 0 auto;">复制活动链接</button>
+      <button id="share-button" class="btn btn-secondary" style="max-width: 300px; margin: 0 auto;">复制活动信息和链接</button>
       <p id="share-message" style="text-align: center; margin-top: 0.5em; height: 1.5em; font-size: 0.9em;"></p>
     </div>
   </div>
@@ -881,17 +883,14 @@
         // 更新活动元信息
         document.getElementById("meetup-meta").innerHTML = `
           <div class="event-meta-item">
-            <i>📅</i>
-            <span>${formatDateTime(meetup.datetime)}</span>
+            <span><strong>时间：</strong>${formatDateTime(meetup.datetime)}</span>
           </div>
           <div class="event-meta-item">
-            <i>📍</i>
-            <span>${meetup.location}</span>
+            <span><strong>地点：</strong>${meetup.location}</span>
           </div>
           ${meetup.duration ? `
           <div class="event-meta-item">
-            <i>⏱️</i>
-            <span>${meetup.duration} 小时</span>
+            <span><strong>时长：</strong>${meetup.duration} 小时</span>
           </div>
           ` : ''}
         `;
@@ -1193,8 +1192,37 @@
 
     document.getElementById("share-button").addEventListener("click", async () => {
       try {
-        await navigator.clipboard.writeText(window.location.href);
-        document.getElementById("share-message").textContent = "链接已复制！";
+        // 构建完整的活动信息文本
+        const title = document.getElementById("meetup-title").textContent;
+        const metaItems = document.querySelectorAll(".event-meta-item");
+        const description = document.getElementById("meetup-description").textContent;
+        const url = window.location.href;
+
+        let shareText = `${title}\n`;
+
+        // 添加活动元信息（时间、地点、时长）
+        metaItems.forEach(item => {
+          const text = item.textContent.trim();
+          if (text) {
+            shareText += `${text}\n`;
+          }
+        });
+
+        // 添加报名信息
+        const going = allRsvps.filter(item => item.status === 'going');
+        const maybe = allRsvps.filter(item => item.status === 'maybe');
+        const totalCount = going.length + maybe.length;
+
+        if (totalCount > 0) {
+          shareText += `\n已有 ${totalCount} 位朋友参与`;
+          shareText += `\n`;
+        }
+
+        // 添加链接和邀请文字
+        shareText += `\n点击链接报名参加：\n${url}`;
+
+        await navigator.clipboard.writeText(shareText);
+        document.getElementById("share-message").textContent = "活动信息已复制！";
 
         // Clear message after a delay
         setTimeout(() => {
