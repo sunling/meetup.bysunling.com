@@ -687,7 +687,7 @@
         const moreText = eventCount > 3 ? `<div class="event-preview">还有 ${eventCount - 3} 个活动...</div>` : '';
 
         return `
-          <div class="date-group${pastClass}${todayClass}" onclick="showDateEvents('${group.date.toISOString().split('T')[0]}')">
+          <div class="date-group${pastClass}${todayClass}" onclick="showDateEvents('${TimeUtils.getLocalDateKey(group.events[0].datetime)}')">
             <div class="date-header">${statusIcon} ${dateStr}</div>
             <div class="date-meta">${weekday} · ${eventCount} 个活动</div>
             ${previewHtml}
