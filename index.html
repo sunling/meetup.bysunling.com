@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>活动列表</title>
   <link rel="stylesheet" href="./styles/shared.css">
   <style>
@@ -16,16 +17,16 @@
       display: flex;
       flex-direction: column;
     }
-    
+
     /* Page specific styles */
-    
+
     .container {
       max-width: 800px;
       margin: 0 auto;
       padding: 2em 1.5em;
       flex: 1;
     }
-    
+
     .page-title {
       font-size: 1.8rem;
       margin-bottom: 0.5em;
@@ -35,39 +36,45 @@
       background-clip: text;
       font-weight: 600;
     }
-    
+
     /* Responsive Design for page specific elements */
     @media (max-width: 768px) {
       .container {
         padding: 1em;
       }
     }
+
     h1 {
       font-size: 2em;
       margin-bottom: 1em;
     }
+
     .event-list {
       display: flex;
       flex-direction: column;
       gap: 1.5em;
     }
+
     .event-card {
       background-color: #fff;
       padding: 1.5em;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
       text-decoration: none;
       color: inherit;
       transition: transform 0.2s ease;
     }
+
     .event-card:hover {
       transform: translateY(-3px);
     }
+
     .event-title {
       font-size: 1.4em;
       font-weight: 600;
       margin-bottom: 0.5em;
     }
+
     .event-meta {
       color: #666;
       font-size: 0.95em;
@@ -92,53 +99,86 @@
       padding: 0 3rem;
       box-sizing: border-box;
     }
-    
+
     @media (min-width: 1200px) {
       .date-groups {
         grid-template-columns: repeat(3, 1fr);
       }
     }
-    
+
     @media (min-width: 900px) and (max-width: 1199px) {
       .date-groups {
         grid-template-columns: repeat(2, 1fr);
       }
     }
-    
+
     @media (max-width: 768px) {
-       .date-groups {
-         grid-template-columns: 1fr;
-         padding: 0 1rem;
-       }
-     }
+      .date-groups {
+        grid-template-columns: 1fr;
+        padding: 0 1rem;
+      }
+    }
+
     .date-group {
       background: #fff;
       border-radius: 12px;
       padding: 1.5em;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       cursor: pointer;
       transition: all 0.3s ease;
       border: 2px solid transparent;
     }
+
     .date-group:hover {
-       transform: translateY(-5px);
-       box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-       border-color: #ff6b9d;
-     }
-     .date-group.past-event {
-       opacity: 0.7;
-       background: #f8f9fa;
-     }
-     .date-group.past-event:hover {
-       opacity: 0.9;
-       border-color: #6c757d;
-     }
-     .date-group.past-event .date-header {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      border-color: #ff6b9d;
+    }
+
+    .date-group.past-event {
+      opacity: 0.7;
+      background: #f8f9fa;
+    }
+
+    .date-group.past-event:hover {
+      opacity: 0.9;
+      border-color: #6c757d;
+    }
+
+    .date-group.past-event .date-header {
        background: linear-gradient(135deg, #6c757d 0%, #adb5bd 50%, #868e96 100%);
        -webkit-background-clip: text;
        -webkit-text-fill-color: transparent;
        background-clip: text;
      }
+     .date-group.today-event {
+       background: linear-gradient(135deg, rgba(255, 107, 157, 0.1) 0%, rgba(255, 167, 38, 0.1) 50%, rgba(66, 165, 245, 0.1) 100%);
+       border: 2px solid #ff6b9d;
+       box-shadow: 0 6px 20px rgba(255, 107, 157, 0.2);
+       animation: pulse-today 2s ease-in-out infinite;
+     }
+     .date-group.today-event:hover {
+       border-color: #ffa726;
+       box-shadow: 0 10px 30px rgba(255, 107, 157, 0.3);
+     }
+     .date-group.today-event .date-header {
+       background: linear-gradient(135deg, #ff6b9d 0%, #ffa726 50%, #42a5f5 100%);
+       -webkit-background-clip: text;
+       -webkit-text-fill-color: transparent;
+       background-clip: text;
+       font-weight: 700;
+     }
+     @keyframes pulse-today {
+       0%, 100% {
+         transform: scale(1);
+         box-shadow: 0 6px 20px rgba(255, 107, 157, 0.2);
+       }
+       50% {
+         transform: scale(1.02);
+         box-shadow: 0 8px 25px rgba(255, 107, 157, 0.3);
+       }
+     }
+
     .date-header {
       font-size: 1.3em;
       font-weight: 600;
@@ -148,11 +188,13 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+
     .date-meta {
       color: #666;
       font-size: 0.9em;
       margin-bottom: 1em;
     }
+
     .event-preview {
       background: #f8f9fa;
       padding: 0.8em;
@@ -160,24 +202,29 @@
       margin-bottom: 0.5em;
       font-size: 0.9em;
     }
+
     .event-preview:last-child {
       margin-bottom: 0;
     }
+
     .event-preview-title {
       font-weight: 500;
       margin-bottom: 0.3em;
     }
+
     .event-preview-desc {
       font-size: 0.8em;
       color: #666;
       margin-bottom: 0.2em;
       line-height: 1.3;
     }
+
     .event-preview-meta {
       font-size: 0.75em;
       color: #888;
       font-weight: 500;
     }
+
     .event-details {
       margin-top: 2em;
       /* 突破container的宽度限制，占据整个页面宽度 */
@@ -190,21 +237,24 @@
       padding: 2em;
       box-sizing: border-box;
     }
+
     .event-details-content {
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 1rem;
     }
-    
+
     .event-details-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1.5em;
     }
+
     .event-details-header h3 {
       margin: 0;
     }
+
     .home-link {
       display: inline-block;
       background: linear-gradient(135deg, #ff6b9d 0%, #ffa726 50%, #42a5f5 100%);
@@ -219,52 +269,78 @@
       position: relative;
       overflow: hidden;
     }
+
     .home-link:hover {
       background: linear-gradient(135deg, #e55a8a 0%, #f57c00 50%, #1976d2 100%);
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
     }
+
     .loading {
       text-align: center;
       color: #666;
       font-size: 1.1em;
       padding: 2em;
     }
+
     .event-card {
       background: #fff;
       border-radius: 8px;
       padding: 1.5em;
       margin-bottom: 1em;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       border-left: 4px solid #ff6b9d;
     }
+
     .event-time {
       color: #ff6b9d;
       font-weight: 600;
       font-size: 1.1em;
       margin-bottom: 0.5em;
     }
+
     .event-title {
       font-size: 1.2em;
       font-weight: 600;
       margin-bottom: 0.8em;
       color: #333;
     }
+
     .event-description {
       color: #666;
       margin-bottom: 0.8em;
       line-height: 1.5;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
+
+    .event-description a {
+      color: #007bff;
+      text-decoration: none;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      display: inline-block;
+      max-width: 100%;
+    }
+
+    .event-description a:hover {
+      text-decoration: underline;
+      color: #0056b3;
+    }
+
     .event-location {
       color: #888;
       font-size: 0.9em;
       margin-bottom: 1em;
     }
+
     .event-actions {
       display: flex;
       gap: 0.8em;
     }
-    .btn-interested, .btn-confirm {
+
+    .btn-interested,
+    .btn-confirm {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -276,28 +352,48 @@
       transition: all 0.2s ease;
       font-size: 0.95em;
     }
+
     .btn-interested {
       color: #666;
       border-color: #F0E68C;
       background: linear-gradient(135deg, rgba(240, 230, 140, 0.2), rgba(255, 228, 225, 0.2));
     }
+
     .btn-interested:hover {
       background: linear-gradient(135deg, rgba(240, 230, 140, 0.3), rgba(255, 228, 225, 0.3));
       transform: translateY(-1px);
       box-shadow: 0 2px 8px rgba(240, 230, 140, 0.3);
     }
+
     .btn-confirm {
       color: #666;
       border-color: #FFB6C1;
       background: linear-gradient(135deg, rgba(255, 182, 193, 0.2), rgba(255, 228, 225, 0.2));
     }
+
     .btn-confirm:hover {
       background: linear-gradient(135deg, rgba(255, 182, 193, 0.3), rgba(255, 228, 225, 0.3));
       transform: translateY(-1px);
       box-shadow: 0 2px 8px rgba(255, 182, 193, 0.3);
     }
+
+    /* 移动端响应式样式 */
+    @media (max-width: 768px) {
+      .event-description {
+        font-size: 0.9em;
+        word-break: break-all;
+        overflow-wrap: anywhere;
+      }
+
+      .event-description a {
+        word-break: break-all;
+        overflow-wrap: anywhere;
+        hyphens: auto;
+      }
+    }
   </style>
 </head>
+
 <body>
   <!-- Header -->
   <header class="site-header">
@@ -364,15 +460,15 @@
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-      
+
       const past = [];
       const today_events = [];
       const future = [];
-      
+
       meetups.forEach(meetup => {
         const eventDate = new Date(meetup.datetime);
         const eventDay = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
-        
+
         if (eventDay < today) {
           past.push(meetup);
         } else if (eventDay.getTime() === today.getTime()) {
@@ -381,41 +477,41 @@
           future.push(meetup);
         }
       });
-      
+
       return { past, today_events, future };
     }
-    
+
     async function loadEvents() {
       try {
         // 使用缓存API获取活动列表
         const { apiWithCache } = await import('./scripts/apiWithCache.js');
-        const events = await apiWithCache.getMeetupsSmartRefresh();
-        
+        const events = await apiWithCache.getMeetups();
+
         // 按日期分组所有活动（包括过去和未来的活动）
         const eventsByDate = groupEventsByDate(events);
-        
+
         displayDateGroups(eventsByDate);
-        
+
         // 检查URL参数，如果有date参数则自动显示对应日期的详情
         const urlParams = new URLSearchParams(window.location.search);
         const dateParam = urlParams.get('date');
         if (dateParam && allEventsByDate[dateParam]) {
           showDateEvents(dateParam);
         }
-        
+
       } catch (error) {
         console.error('加载活动失败:', error);
         document.getElementById('date-groups').innerHTML = '<div class="loading">加载失败</div>';
       }
     }
-    
+
     function groupEventsByDate(events) {
       const groups = {};
-      
+
       events.forEach(event => {
         const eventDate = new Date(event.datetime);
         const dateKey = TimeUtils.getLocalDateKey(event.datetime); // 使用本地时间生成日期键
-        
+
         if (!groups[dateKey]) {
           // 创建基于本地日期的Date对象
           const localDate = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
@@ -424,22 +520,22 @@
             events: []
           };
         }
-        
+
         groups[dateKey].events.push(event);
       });
-      
+
       // 按日期排序：将来的活动正序（最早在前），过去的活动倒序（最新在前）
       const now = new Date();
-      
+
       return Object.keys(groups)
         .sort((a, b) => {
           const dateA = new Date(a);
           const dateB = new Date(b);
-          
+
           // 检查每个日期组中是否还有未来的活动（考虑具体时间）
           const hasAFutureEvents = groups[a].events.some(event => new Date(event.datetime) > now);
           const hasBFutureEvents = groups[b].events.some(event => new Date(event.datetime) > now);
-          
+
           // 如果两个日期组都有将来的活动，按正序排列（早的在前）
           if (hasAFutureEvents && hasBFutureEvents) {
             return dateA - dateB;
@@ -455,31 +551,31 @@
         })
         .map(key => groups[key]);
     }
-    
 
-    
+
+
     let allEventsByDate = {};
-    
+
     function showDateEvents(dateKey) {
       const group = allEventsByDate[dateKey];
       if (!group) return;
-      
+
       const dateStr = formatDateForDisplay(group.date);
       const weekday = group.date.toLocaleDateString('zh-CN', { weekday: 'long' });
-      
+
       // 更新URL参数，添加日期参数
       const url = new URL(window.location);
       url.searchParams.set('date', dateKey);
       window.history.pushState({}, '', url);
-      
+
       document.getElementById('selected-date-title').innerHTML = `${dateStr} ${weekday}`;
-      
+
       const eventsHtml = group.events.map(event => {
         const time = new Date(event.datetime).toLocaleTimeString('zh-CN', {
           hour: '2-digit',
           minute: '2-digit'
         });
-        
+
         return `
           <div class="event-card" onclick="window.location.href='meetup?id=${event.id}'" style="cursor: pointer;">
             <div class="event-time">${time}</div>
@@ -487,43 +583,43 @@
             <div class="event-description">${event.description || ''}</div>
             <div class="event-location">${event.location || ''}</div>
             <div class="event-actions" onclick="event.stopPropagation();">
-              <button class="btn-interested" onclick="goToMeetup(${event.id}, 'maybe')">感兴趣</button>
-              <button class="btn-confirm" onclick="goToMeetup(${event.id}, 'going')">确定参加</button>
+              <button class="btn-confirm" onclick="goToMeetup(${event.id}, 'going')">✓ 确定参加</button>
+              <button class="btn-interested" onclick="goToMeetup(${event.id}, 'maybe')">? 感兴趣</button>
             </div>
           </div>
         `;
       }).join('');
-      
+
       document.getElementById('selected-date-events').innerHTML = eventsHtml;
       document.getElementById('date-groups').style.display = 'none';
       document.getElementById('event-details').style.display = 'block';
     }
-    
+
     // 将函数暴露到全局作用域
     window.showDateEvents = showDateEvents;
-    
+
     function showDateGroups() {
       // 清除URL中的日期参数
       const url = new URL(window.location);
       url.searchParams.delete('date');
       window.history.pushState({}, '', url);
-      
+
       document.getElementById('date-groups').style.display = 'grid';
       document.getElementById('event-details').style.display = 'none';
       // 原新建活动按钮已移除
     }
-    
+
     function formatDateForDisplay(date) {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
       return `${year}年${month}月${day}日`;
     }
-    
+
     // 修改 displayDateGroups 函数以保存数据
     function displayDateGroups(dateGroups) {
       const container = document.getElementById('date-groups');
-      
+
       if (dateGroups.length === 0) {
         container.innerHTML = `
           <div style="text-align: center; padding: 3em 2em; color: #666;">
@@ -546,28 +642,30 @@
         `;
         return;
       }
-      
+
       // 保存数据供详情页使用
       allEventsByDate = {};
       dateGroups.forEach(group => {
         const dateKey = TimeUtils.getLocalDateKey(group.events[0].datetime); // 使用第一个事件的时间生成本地日期键
         allEventsByDate[dateKey] = group;
       });
-      
+
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      
+
       const html = dateGroups.map(group => {
         const dateStr = formatDateForDisplay(group.date);
         const weekday = group.date.toLocaleDateString('zh-CN', { weekday: 'long' });
         const eventCount = group.events.length;
-        
-        // 判断是否为过去的活动
+
+        // 判断是否为过去的活动或今日活动
         const eventDay = new Date(group.date.getFullYear(), group.date.getMonth(), group.date.getDate());
         const isPast = eventDay < today;
+        const isToday = eventDay.valueOf() === today.valueOf();
         const pastClass = isPast ? ' past-event' : '';
-        const statusIcon = isPast ? '📅' : '🔥';
-        
+        const todayClass = isToday ? ' today-event' : '';
+        const statusIcon = isPast ? '📅' : (isToday ? '⚡' : '🔥');
+
         const previewHtml = group.events.slice(0, 3).map(event => {
           const time = new Date(event.datetime).toLocaleTimeString('zh-CN', {
             hour: '2-digit',
@@ -576,7 +674,7 @@
           const description = event.description ? (event.description.length > 30 ? event.description.slice(0, 30) + '...' : event.description) : '';
           const rsvpCount = event.rsvp_count || 0;
           const participantInfo = rsvpCount > 0 ? `${rsvpCount}人参与` : '';
-          
+
           return `
             <div class="event-preview">
               <div class="event-preview-title">${time} - ${event.title}</div>
@@ -585,11 +683,11 @@
             </div>
           `;
         }).join('');
-        
+
         const moreText = eventCount > 3 ? `<div class="event-preview">还有 ${eventCount - 3} 个活动...</div>` : '';
-        
+
         return `
-          <div class="date-group${pastClass}" onclick="showDateEvents('${group.date.toISOString().split('T')[0]}')">
+          <div class="date-group${pastClass}${todayClass}" onclick="showDateEvents('${group.date.toISOString().split('T')[0]}')">
             <div class="date-header">${statusIcon} ${dateStr}</div>
             <div class="date-meta">${weekday} · ${eventCount} 个活动</div>
             ${previewHtml}
@@ -597,25 +695,25 @@
           </div>
         `;
       }).join('');
-      
+
       container.innerHTML = html;
-     }
-     
-     function goToMeetup(meetupId, action) {
-       // 跳转到活动详情页面，并传递动作参数
-       const url = `meetup?id=${meetupId}&action=${action}`;
-       window.location.href = url;
-     }
+    }
+
+    function goToMeetup(meetupId, action) {
+      // 跳转到活动详情页面，并传递动作参数
+      const url = `meetup?id=${meetupId}&action=${action}`;
+      window.location.href = url;
+    }
 
     // 将函数暴露到全局作用域
     window.goToMeetup = goToMeetup;
 
     // 监听浏览器回退/前进按钮
-    window.addEventListener('popstate', function(event) {
+    window.addEventListener('popstate', function (event) {
       // 检查URL参数，如果有date参数则显示对应日期的详情，否则显示日期分组
       const urlParams = new URLSearchParams(window.location.search);
       const dateParam = urlParams.get('date');
-      
+
       if (dateParam && allEventsByDate[dateParam]) {
         showDateEvents(dateParam);
       } else {
@@ -626,4 +724,5 @@
     loadEvents();
   </script>
 </body>
+
 </html>

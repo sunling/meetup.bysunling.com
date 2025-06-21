@@ -96,6 +96,29 @@
 
 ### 本地开发
 
+### 环境变量配置
+
+在项目根目录创建 `.env` 文件，配置以下环境变量：
+
+```env
+# Supabase 配置
+SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# GitHub 配置（用于图片上传）
+GITHUB_TOKEN=your_github_token
+GITHUB_REPO_OWNER=your_github_username
+GITHUB_REPO_NAME=your_repo_name
+GITHUB_BRANCH=main
+
+# 管理员配置
+ADMIN_TOKEN=your_admin_token
+
+# OpenRouter API 配置（用于AI生成分享文案）
+OPENROUTER_API_KEY=your_openrouter_api_key
+```
+
+> **注意：** `.env` 文件已在 `.gitignore` 中，不会被提交到代码仓库。
+
 1. **克隆项目**
 ```bash
 git clone https://github.com/your-username/meetup.bysunling.com.git

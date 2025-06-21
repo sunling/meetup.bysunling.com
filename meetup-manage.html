@@ -495,9 +495,10 @@
                   </button>
                 </p>
               </div>
-              <div class="text-center">
+              <div class="text-center" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                 <button class="btn btn-dopamine" id="edit-button">编辑活动信息</button>
               </div>
+              <div class="status-message mt-3" id="ai-share-status"></div>
             </div>
           
           <div class="edit-form content-section mt-3" id="edit-form">
@@ -552,6 +553,56 @@
             }
           }
         });
+
+        // Add AI share functionality
+        // document.getElementById("ai-share-button").addEventListener("click", async () => {
+        //   const aiButton = document.getElementById("ai-share-button");
+        //   const statusDiv = document.getElementById("ai-share-status");
+          
+        //   try {
+        //     // 显示加载状态
+        //     aiButton.disabled = true;
+        //     aiButton.textContent = "生成中...";
+        //     statusDiv.textContent = "正在生成分享文案，请稍候...";
+        //     statusDiv.className = "status-message";
+        //     statusDiv.style.display = "block";
+        //     statusDiv.style.color = "#666";
+            
+        //     // 构建活动信息
+        //     const eventInfo = `活动标题：${meetup.title}\n活动时间：${formatDateTime(meetup.datetime)}\n活动地点：${meetup.location}\n活动详情：${meetup.description}\n发起人微信号：${meetup.wechat_id}`;
+            
+        //     // 添加报名信息
+        //     const going = rsvps.filter(item => item.status === 'going');
+        //     const maybe = rsvps.filter(item => item.status === 'maybe');
+        //     const totalCount = going.length + maybe.length;
+        //     if (totalCount > 0) {
+        //       eventInfo += `\n已有 ${totalCount} 位朋友参与`;
+        //     }
+            
+        //     // 调用AI生成分享文案
+        //     const aiShareText = await generateAIShareText(eventInfo, publicUrl);
+            
+        //     // 复制到剪贴板
+        //     await navigator.clipboard.writeText(aiShareText);
+        //     statusDiv.textContent = "AI生成的分享文案已复制到剪贴板！";
+        //     statusDiv.style.color = "#28a745";
+            
+        //   } catch (error) {
+        //     console.error('AI生成分享文案失败:', error);
+        //     statusDiv.textContent = `AI生成失败：${error.message}`;
+        //     statusDiv.style.color = "#dc3545";
+        //   } finally {
+        //     // 恢复按钮状态
+        //     aiButton.disabled = false;
+        //     aiButton.textContent = "AI生成分享文案";
+            
+        //     // 5秒后清除消息
+        //     setTimeout(() => {
+        //       statusDiv.style.display = "none";
+        //     }, 5000);
+        //   }
+        // });
+        
         // Add copy signup link functionality
         document.getElementById("copy-signup-button").addEventListener("click", async () => {
           const button = document.getElementById("copy-signup-button");
@@ -846,6 +897,29 @@
     function formatDateTime(datetimeStr) {
       // 使用统一的时间显示函数
       return TimeUtils.formatDateTimeForDisplay(datetimeStr);
+    }
+
+    // AI生成分享文案的函数
+    async function generateAIShareText(eventInfo, eventUrl) {
+      // 调用Netlify函数
+      const response = await fetch('/.netlify/functions/generateShareText', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          eventInfo: eventInfo,
+          eventUrl: eventUrl
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `服务调用失败: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.shareText;
     }
 
     // Tab switching function

@@ -579,7 +579,7 @@
           <div id="meetup-meta" class="event-meta">
             <p>正在加载...</p>
           </div>
-          
+
         </div>
 
         <!-- 报名和参与者信息 -->
@@ -646,7 +646,9 @@
     </div>
 
     <div class="share-section" style="padding: 20px 40px; border-top: 1px solid #e0e0e0;">
-      <button id="share-button" class="btn btn-secondary" style="max-width: 300px; margin: 0 auto;">复制活动信息和链接</button>
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center;">
+        <button id="share-button" class="btn btn-secondary" style="max-width: 300px;">复制活动信息和链接</button>
+      </div>
       <p id="share-message" style="text-align: center; margin-top: 0.5em; height: 1.5em; font-size: 0.9em;"></p>
     </div>
   </div>
@@ -1261,6 +1263,8 @@
       }
     });
 
+
+
     // Close dialogs when clicking outside
     dialog.addEventListener("click", (e) => {
       if (e.target === dialog) {
@@ -1273,6 +1277,8 @@
         closeConfirmDialog();
       }
     });
+
+
 
 
     // Initialize

@@ -211,6 +211,12 @@
 
     <label>活动描述 <span style="color: red;">*</span></label>
     <textarea id="description" rows="5" placeholder="请填写活动内容"></textarea>
+    <div style="margin-top: 0.5em; display: flex; align-items: center; gap: 1em;">
+      <button type="button" id="generateDescriptionBtn" class="btn btn-secondary" onclick="generateActivityDescription()" style="margin: 0; padding: 0.5em 1em; font-size: 0.9em;">
+         AI生成活动介绍
+      </button>
+      <div id="generateDescriptionStatus" style="font-size: 0.9em; color: #666;"></div>
+    </div>
 
     <label>微信号 <span style="color: red;">*</span></label>
     <input id="wechat" placeholder="请输入你的微信号"/>
@@ -228,6 +234,10 @@
   <script type="module" src="scripts/apiWithCache.js"></script>
   <script>
     let qrcodeBase64 = '';
+    // 点击次数计数器
+    let generateClickCount = 0;
+    const maxGenerateClicks = 2;
+    
     // 将submitForm函数定义为全局函数
     window.submitForm = async function() {
       const title = document.getElementById("title").value.trim();
@@ -293,6 +303,93 @@
         console.error('复制失败:', err);
         alert('复制失败，请手动复制');
       });
+    };
+
+    // AI生成活动介绍功能
+    window.generateActivityDescription = async function() {
+      // 检查点击次数限制
+      if (generateClickCount >= maxGenerateClicks) {
+        document.getElementById("generateDescriptionStatus").innerText = "已达到最大生成次数限制（2次）";
+        document.getElementById("generateDescriptionStatus").style.color = "#f44336";
+        return;
+      }
+      
+      const title = document.getElementById("title").value.trim();
+      const location = document.getElementById("location").value.trim();
+      const duration = document.getElementById("duration").value.trim();
+      const currentDescription = document.getElementById("description").value.trim();
+      
+      if (!title) {
+        document.getElementById("generateDescriptionStatus").innerText = "请先填写活动标题";
+        return;
+      }
+      
+      // 增加点击次数
+      generateClickCount++;
+      
+      const btn = document.getElementById("generateDescriptionBtn");
+      const status = document.getElementById("generateDescriptionStatus");
+      
+      // 显示加载状态
+      btn.disabled = true;
+      btn.innerText = "🤖 生成中...";
+      status.innerText = "正在生成活动介绍，请稍候...";
+      status.style.color = "#666";
+      
+      try {
+        // 构建活动信息
+        const activityInfo = {
+          title: title,
+          location: location || "待定",
+          duration: duration ? `${duration}小时` : "待定",
+          currentDescription: currentDescription || "无"
+        };
+        
+        const response = await fetch('/.netlify/functions/generateActivityDescription', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(activityInfo)
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.success && result.description) {
+          document.getElementById("description").value = result.description;
+          status.innerText = "✅ 活动介绍已生成";
+          status.style.color = "#4CAF50";
+        } else {
+          throw new Error(result.error || '生成失败');
+        }
+      } catch (error) {
+        console.error('生成活动介绍失败:', error);
+        status.innerText = `❌ 生成失败: ${error.message}`;
+        status.style.color = "#f44336";
+        // 如果失败，减少点击次数
+        generateClickCount--;
+      } finally {
+        // 恢复按钮状态
+        btn.disabled = false;
+        
+        // 更新按钮文本显示剩余次数
+        const remainingClicks = maxGenerateClicks - generateClickCount;
+        if (remainingClicks > 0) {
+          btn.innerText = `🤖 AI生成活动介绍 (${remainingClicks}/${maxGenerateClicks})`;
+        } else {
+          btn.innerText = "🤖 已达使用限制";
+          btn.disabled = true;
+        }
+        
+        // 3秒后清除状态信息
+        setTimeout(() => {
+          status.innerText = "";
+        }, 3000);
+      }
     };
   </script>
   <script type="module">
