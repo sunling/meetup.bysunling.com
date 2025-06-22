@@ -274,10 +274,15 @@
         const result = await apiWithCache.createMeetup({ title, datetime, location, duration, description, wechat, qrcode: qrcodeUrl, creator });
 
         if (result.id && result.manage_token) {
-          const manageLink = `${window.location.origin}/meetup-manage?token=${result.manage_token}`;
-          
-          // 直接跳转到管理页面
-          window.location.href = manageLink;
+          // 根据用户登录状态决定跳转目标
+          if (currentUser) {
+            // 已登录用户跳转到我的活动页
+            window.location.href = `${window.location.origin}/my-meetups`;
+          } else {
+            // 未登录用户跳转到活动管理页
+            const manageLink = `${window.location.origin}/meetup-manage?token=${result.manage_token}`;
+            window.location.href = manageLink;
+          }
         } else {
           document.getElementById("message").innerText = result.error || "提交失败";
         }

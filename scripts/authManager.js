@@ -33,14 +33,22 @@ class AuthManager {
           console.error('Failed to parse user data from URL:', e);
         }
       } else {
-        // 从localStorage获取用户信息
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-          try {
-            this.currentUser = JSON.parse(storedUser);
-          } catch (e) {
-            console.error('Failed to parse stored user data:', e);
-            localStorage.removeItem('currentUser');
+        // 尝试从主域名 cookie 中获取认证信息
+        const authFromCookie = this.getAuthFromCookie();
+        if (authFromCookie) {
+          this.currentUser = authFromCookie;
+          // 同步到localStorage
+          localStorage.setItem('currentUser', JSON.stringify(authFromCookie));
+        } else {
+          // 从localStorage获取用户信息
+          const storedUser = localStorage.getItem('currentUser');
+          if (storedUser) {
+            try {
+              this.currentUser = JSON.parse(storedUser);
+            } catch (e) {
+              console.error('Failed to parse stored user data:', e);
+              localStorage.removeItem('currentUser');
+            }
           }
         }
       }
@@ -50,6 +58,29 @@ class AuthManager {
     } catch (error) {
       console.error('Auth manager initialization error:', error);
       this.initialized = true;
+    }
+  }
+
+  // 从主域名 cookie 中获取认证信息
+  getAuthFromCookie() {
+    try {
+      // 使用 CrossDomainAuth 实例获取认证信息
+      if (typeof CrossDomainAuth !== 'undefined') {
+        const crossDomainAuth = new CrossDomainAuth();
+        const token = crossDomainAuth.getToken();
+        const user = crossDomainAuth.getUser();
+        if (token && user) {
+          return {
+            ...user,
+            authToken: token
+          };
+        }
+      }
+      
+      return null;
+    } catch (e) {
+      console.error('Failed to get auth data from CrossDomainAuth:', e);
+      return null;
     }
   }
 

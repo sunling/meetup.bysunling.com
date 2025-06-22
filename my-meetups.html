@@ -135,6 +135,32 @@
       display: flex;
       gap: 1em;
       align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .stats-left {
+      display: flex;
+      gap: 1em;
+      align-items: center;
+    }
+
+    .manage-btn {
+      padding: 0.5em 1em;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.85em;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
+    }
+
+    .manage-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
     }
 
     .stat-item {
@@ -205,7 +231,18 @@
       .meetup-stats {
         flex-direction: column;
         align-items: flex-start;
+        gap: 0.8em;
+      }
+
+      .stats-left {
+        flex-wrap: wrap;
         gap: 0.5em;
+      }
+
+      .manage-btn {
+        align-self: flex-end;
+        font-size: 0.8em;
+        padding: 0.4em 0.8em;
       }
     }
   </style>
@@ -283,6 +320,10 @@
       const statusInfo = formatStatus(meetup.status);
       const formattedDate = TimeUtils.formatDateTime(meetup.datetime);
       
+      // 构建管理链接，优先使用 manage_token，如果没有则使用 id
+      const manageToken = meetup.manage_token || meetup.id;
+      const manageUrl = `./meetup-manage.html?token=${encodeURIComponent(manageToken)}`;
+      
       return `
         <div class="meetup-card">
           <div class="meetup-title">${meetup.title}</div>
@@ -291,12 +332,17 @@
           </div>
           <div class="meetup-description">${meetup.description}</div>
           <div class="meetup-stats">
-            <div class="stat-item">
-              👥 ${meetup.rsvp_count || 0} 人报名
+            <div class="stats-left">
+              <div class="stat-item">
+                👥 ${meetup.rsvp_count || 0} 人报名
+              </div>
+              <div class="status-badge ${statusInfo.class}">
+                ${statusInfo.text}
+              </div>
             </div>
-            <div class="status-badge ${statusInfo.class}">
-              ${statusInfo.text}
-            </div>
+            <a href="${manageUrl}" class="manage-btn">
+              ⚙️ 管理
+            </a>
           </div>
         </div>
       `;
