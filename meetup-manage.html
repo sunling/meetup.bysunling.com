@@ -8,6 +8,7 @@
   <script src="./scripts/timeUtils.js"></script>
   <script type="module" src="scripts/cacheManager.js"></script>
   <script type="module" src="scripts/apiWithCache.js"></script>
+  <script type="module" src="scripts/headerLoader.js"></script>
   <link rel="stylesheet" href="./styles/shared.css">
   <style>
     /* Token input styles */
@@ -365,33 +366,8 @@
 
 <body>
   <!-- Header -->
-  <header class="site-header">
-    <div class="header-container">
-      <a href="/" class="logo-section">
-        <div class="logo">
-          <img src="logo.svg" alt="聚友圈Logo" width="40" height="40">
-        </div>
-        <div class="brand-text">
-          <h1 class="brand-name">聚友圈</h1>
-          <p class="brand-slogan">你不是一个人，我们只是还没遇见</p>
-        </div>
-      </a>
-      <div class="nav-auth-wrapper">
-        <nav class="header-nav">
-          <a href="/" class="nav-link">首页</a>
-          <a href="new-meetup" class="nav-link">发起活动</a>
-          <a href="meetup-manage" class="nav-link active">管理</a>
-        </nav>
-        <div class="auth-section">
-          <div id="auth-info" class="auth-info" style="display: none;">
-            <span id="user-name" class="user-name"></span>
-            <button id="logout-btn" class="logout-btn">退出</button>
-          </div>
-          <a href="https://bysunling.com/auth?redirect=https://meetup.bysunling.com/meetup-manage" id="login-btn" class="login-btn">登录</a>
-        </div>
-      </div>
-    </div>
-  </header>
+    <!-- 共享Header容器 -->
+  <div id="shared-header-container"></div>
   <div class="container">
     <!-- Token输入界面 -->
     <div id="token-input-section" style="display: none;">

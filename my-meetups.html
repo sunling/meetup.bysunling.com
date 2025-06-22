@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我的活动 - 聚友圈</title>
+  <link rel="stylesheet" href="./styles/shared.css">
+  <script type="module" src="scripts/headerLoader.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9f1ea 100%);
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2em 1.5em;
+      flex: 1;
+    }
+
+    .page-title {
+      font-size: 1.8rem;
+      margin-bottom: 0.5em;
+      background: linear-gradient(135deg, #ff6b9d 0%, #ffa726 50%, #42a5f5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 600;
+    }
+
+    .login-prompt {
+      text-align: center;
+      padding: 3em 2em;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      margin: 2em 0;
+    }
+
+    .login-prompt h2 {
+      color: #666;
+      margin-bottom: 1em;
+    }
+
+    .login-prompt p {
+      color: #888;
+      margin-bottom: 2em;
+    }
+
+    .login-prompt .login-btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: transform 0.2s ease;
+    }
+
+    .login-prompt .login-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .user-info {
+      background: white;
+      padding: 1.5em;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2em;
+    }
+
+    .user-info h2 {
+      margin: 0 0 0.5em 0;
+      color: #333;
+    }
+
+    .user-info p {
+      margin: 0;
+      color: #666;
+    }
+
+    .meetups-section {
+      margin-top: 2em;
+    }
+
+    .section-title {
+      font-size: 1.3em;
+      font-weight: 600;
+      margin-bottom: 1em;
+      color: #333;
+    }
+
+    .meetup-card {
+      background: white;
+      padding: 1.5em;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1em;
+      transition: transform 0.2s ease;
+    }
+
+    .meetup-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .meetup-title {
+      font-size: 1.2em;
+      font-weight: 600;
+      margin-bottom: 0.5em;
+      color: #333;
+    }
+
+    .meetup-meta {
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 0.8em;
+    }
+
+    .meetup-description {
+      color: #555;
+      line-height: 1.5;
+      margin-bottom: 1em;
+    }
+
+    .meetup-stats {
+      display: flex;
+      gap: 1em;
+      align-items: center;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3em;
+      color: #666;
+      font-size: 0.9em;
+    }
+
+    .status-badge {
+      padding: 0.3em 0.8em;
+      border-radius: 20px;
+      font-size: 0.8em;
+      font-weight: 500;
+    }
+
+    .status-approved {
+      background: #e8f5e8;
+      color: #2e7d32;
+    }
+
+    .status-pending {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3em 2em;
+      color: #666;
+    }
+
+    .empty-state h3 {
+      margin-bottom: 1em;
+    }
+
+    .empty-state p {
+      margin-bottom: 2em;
+    }
+
+    .create-meetup-btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: transform 0.2s ease;
+    }
+
+    .create-meetup-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2em;
+      color: #666;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 1em;
+      }
+
+      .meetup-stats {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5em;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 共享Header容器 -->
+  <div id="shared-header-container"></div>
+
+  <div class="container">
+    <h2 class="page-title">我的活动</h2>
+    
+    <!-- 未登录状态 -->
+    <div id="login-prompt" class="login-prompt" style="display: none;">
+      <h2>请先登录</h2>
+      <p>登录后即可查看您发起的所有活动</p>
+      <a href="https://bysunling.com/auth?redirect=https://meetup.bysunling.com/my-meetups" class="login-btn">立即登录</a>
+    </div>
+
+    <!-- 已登录状态 -->
+    <div id="user-content" style="display: none;">
+      <div id="user-info" class="user-info">
+        <h2 id="welcome-text">欢迎回来！</h2>
+        <p>这里是您发起的所有活动</p>
+      </div>
+
+      <div id="loading" class="loading">
+        <p>正在加载您的活动...</p>
+      </div>
+
+      <div id="meetups-container" class="meetups-section" style="display: none;">
+        <div id="meetups-list"></div>
+      </div>
+
+      <div id="empty-state" class="empty-state" style="display: none;">
+        <h3>还没有发起过活动</h3>
+        <p>快来发起您的第一个活动，与志同道合的朋友相聚吧！</p>
+        <a href="new-meetup" class="create-meetup-btn">发起活动</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <img src="logo.svg" alt="聚友圈Logo" width="24" height="24">
+          <span class="footer-brand">聚友圈</span>
+        </div>
+        <p class="footer-text">&copy; 2025 聚友圈 - 愿每一次活动，都是一次靠近</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="scripts/timeUtils.js"></script>
+  <script type="module" src="scripts/cacheManager.js"></script>
+  <script type="module" src="scripts/apiWithCache.js"></script>
+  <script type="module">
+    import { authManager } from './scripts/authManager.js';
+
+    let currentUser = null;
+
+    // 格式化活动状态
+    function formatStatus(status) {
+      const statusMap = {
+        'approved': { text: '已通过', class: 'status-approved' },
+        'pending': { text: '待审核', class: 'status-pending' },
+        'rejected': { text: '已拒绝', class: 'status-rejected' }
+      };
+      return statusMap[status] || { text: '未知', class: 'status-unknown' };
+    }
+
+    // 创建活动卡片
+    function createMeetupCard(meetup) {
+      const statusInfo = formatStatus(meetup.status);
+      const formattedDate = TimeUtils.formatDateTime(meetup.datetime);
+      
+      return `
+        <div class="meetup-card">
+          <div class="meetup-title">${meetup.title}</div>
+          <div class="meetup-meta">
+            📅 ${formattedDate} | 📍 ${meetup.location}
+          </div>
+          <div class="meetup-description">${meetup.description}</div>
+          <div class="meetup-stats">
+            <div class="stat-item">
+              👥 ${meetup.rsvp_count || 0} 人报名
+            </div>
+            <div class="status-badge ${statusInfo.class}">
+              ${statusInfo.text}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 加载用户活动
+    async function loadUserMeetups() {
+      if (!currentUser || !currentUser.username) {
+        document.getElementById('empty-state').style.display = 'block';
+        document.getElementById('loading').style.display = 'none';
+        return;
+      }
+
+      try {
+        const { apiWithCache } = await import('./scripts/apiWithCache.js');
+        const meetups = await apiWithCache.getUserMeetups(currentUser.username);
+        
+        document.getElementById('loading').style.display = 'none';
+        
+        if (meetups && meetups.length > 0) {
+          const meetupsHtml = meetups.map(meetup => createMeetupCard(meetup)).join('');
+          document.getElementById('meetups-list').innerHTML = meetupsHtml;
+          document.getElementById('meetups-container').style.display = 'block';
+        } else {
+          document.getElementById('empty-state').style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Error loading user meetups:', error);
+        document.getElementById('loading').innerHTML = '<p style="color: #f44336;">加载失败，请稍后重试</p>';
+      }
+    }
+
+    // 初始化页面
+    async function initPage() {
+      // 检查用户登录状态
+      currentUser = await authManager.getCurrentUser();
+      
+      if (currentUser) {
+        // 已登录，显示用户内容
+        document.getElementById('login-prompt').style.display = 'none';
+        document.getElementById('user-content').style.display = 'block';
+        
+        // 更新欢迎信息
+        const welcomeText = document.getElementById('welcome-text');
+        welcomeText.textContent = `欢迎回来，${currentUser.name || currentUser.username}！`;
+        
+        // 加载用户活动
+        await loadUserMeetups();
+      } else {
+        // 未登录，显示登录提示
+        document.getElementById('login-prompt').style.display = 'block';
+        document.getElementById('user-content').style.display = 'none';
+      }
+    }
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+
+</html>

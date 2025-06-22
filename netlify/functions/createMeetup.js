@@ -20,7 +20,7 @@ export async function handler(event, context) {
 
   try {
     const data = JSON.parse(event.body);
-    const { title, datetime, location, description, wechat, qrcode, duration } = data;
+    const { title, datetime, location, description, wechat, qrcode, duration, creator } = data;
 
     if (!title || !datetime || !location || !description || !wechat) {
       return {
@@ -41,6 +41,7 @@ export async function handler(event, context) {
       qrcode,
       status: 'approved',
       duration,
+      creator,
     };
 
     const { data: inserted, error } = await supabase

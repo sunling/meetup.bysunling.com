@@ -171,6 +171,19 @@ class ApiWithCache {
     );
   }
 
+  async getUserMeetups(creator) {
+    if (!creator) {
+      throw new Error('Creator parameter is required');
+    }
+    
+    const queryString = new URLSearchParams({ creator }).toString();
+    return cacheManager.withCache(
+      'userMeetups',
+      () => this.apiCall(`${this.baseUrl}/.netlify/functions/getUserMeetups?${queryString}`),
+      { creator }
+    );
+  }
+
   /**
    * 预加载常用数据
    */

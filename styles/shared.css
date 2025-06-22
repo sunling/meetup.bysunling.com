@@ -195,7 +195,7 @@ body {
 .nav-auth-wrapper {
   display: flex;
   align-items: center;
-  gap: 3rem;
+  gap: 2rem;
 }
 
 .logo-section {
@@ -327,20 +327,21 @@ body {
 }
 
 .login-btn, .logout-btn {
-  background: transparent;
-  color: #333;
   text-decoration: none;
-  padding: 0.6rem 1.4rem;
-  border-radius: 25px;
+  color: #666;
   font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  background: transparent;
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease;
 }
 
 .login-btn:hover, .logout-btn:hover {
-  transform: translateY(-2px);
-  color: #000;
+  color: #ff6b9d;
+  background: rgba(255, 107, 157, 0.1);
 }
 
 .logout-btn {
