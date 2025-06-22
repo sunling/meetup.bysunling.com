@@ -272,6 +272,17 @@ body {
   padding: 1.5rem 0;
 }
 
+/* 确保页面布局支持footer停留在底部 */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container, .form-container, main {
+  flex: 1;
+}
+
 .footer-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -326,7 +337,7 @@ body {
   font-size: 0.9rem;
 }
 
-.login-btn, .logout-btn {
+.login-btn {
   text-decoration: none;
   color: #666;
   font-weight: 500;
@@ -339,17 +350,97 @@ body {
   cursor: pointer;
 }
 
-.login-btn:hover, .logout-btn:hover {
+.login-btn:hover {
   color: #ff6b9d;
   background: rgba(255, 107, 157, 0.1);
 }
 
-.logout-btn {
-  background: transparent;
-  color: #e53e3e;
+/* 用户下拉菜单样式 */
+.user-dropdown {
+  position: relative;
 }
 
-.logout-btn:hover {
+.user-dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  color: #2d3748;
+}
+
+.user-dropdown-toggle:hover {
+  background: rgba(255, 107, 157, 0.1);
+}
+
+.dropdown-arrow {
+  transition: transform 0.2s ease;
+  color: #666;
+}
+
+.user-dropdown.active .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.user-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 160px;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+}
+
+.user-dropdown.active .user-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: #2d3748;
+  font-size: 0.9rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: #f7fafc;
+}
+
+.dropdown-item:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.dropdown-item:last-child {
+  border-radius: 0 0 8px 8px;
+}
+
+.logout-item {
+  color: #e53e3e;
+  border-top: 1px solid #e2e8f0;
+}
+
+.logout-item:hover {
+  background: #fed7d7;
   color: #c53030;
 }
 
@@ -374,8 +465,23 @@ body {
     margin-bottom: 0.5rem;
   }
 
-  .login-btn, .logout-btn {
+  .login-btn {
     padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .user-dropdown-toggle {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .user-dropdown-menu {
+    right: -1rem;
+    min-width: 140px;
+  }
+
+  .dropdown-item {
+    padding: 0.6rem 0.8rem;
     font-size: 0.8rem;
   }
   

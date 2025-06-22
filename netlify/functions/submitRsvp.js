@@ -17,7 +17,7 @@ export async function handler(event) {
   }
 
   try {
-    const { meetup_id, name, wechat_id, status } = JSON.parse(event.body);
+    const { meetup_id, name, wechat_id, status, username } = JSON.parse(event.body);
 
     if (!meetup_id || !name || !status) {
       return {
@@ -49,9 +49,15 @@ export async function handler(event) {
       };
     }
 
+    // 构建插入数据，如果有username则包含它
+    const insertData = { meetup_id, name, wechat_id, status };
+    if (username) {
+      insertData.username = username;
+    }
+
     const { data, error } = await supabase
       .from('meetup_rsvps')
-      .insert([{ meetup_id, name, wechat_id, status }])
+      .insert([insertData])
       .select();
 
     if (error) {

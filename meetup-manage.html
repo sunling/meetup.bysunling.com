@@ -9,6 +9,7 @@
   <script type="module" src="scripts/cacheManager.js"></script>
   <script type="module" src="scripts/apiWithCache.js"></script>
   <script type="module" src="scripts/headerLoader.js"></script>
+  <script type="module" src="scripts/footerLoader.js"></script>
   <link rel="stylesheet" href="./styles/shared.css">
   <style>
     /* Token input styles */
@@ -970,18 +971,8 @@
   <!-- 悬浮新建活动按钮 -->
   <!-- <a href="new-meetup" class="floating-new-meetup" title="点击发起活动">+</a> -->
 
-  <!-- Footer -->
-  <footer class="site-footer">
-    <div class="footer-container">
-      <div class="footer-simple">
-        <div class="footer-logo">
-          <img src="logo.svg" alt="聚友圈Logo" width="24" height="24">
-          <span class="footer-brand">聚友圈</span>
-        </div>
-        <p class="footer-text">&copy; 2025 聚友圈 - 愿每一次活动，都是一次靠近</p>
-      </div>
-    </div>
-  </footer>
+  <!-- 共享Footer容器 -->
+  <div id="shared-footer-container"></div>
 
   <!-- Auth Utils Script -->
   <script src="https://bysunling.com/scripts/auth-utils.js"></script>

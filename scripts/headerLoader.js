@@ -61,9 +61,39 @@ class HeaderLoader {
     }
   }
 
+  // 初始化用户下拉菜单交互
+  initUserDropdown() {
+    const dropdownToggle = document.getElementById('user-dropdown-toggle');
+    const dropdown = document.querySelector('.user-dropdown');
+    const dropdownMenu = document.getElementById('user-dropdown-menu');
+
+    if (dropdownToggle && dropdown) {
+      // 点击切换下拉菜单
+      dropdownToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('active');
+      });
+
+      // 点击页面其他地方关闭下拉菜单
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target)) {
+          dropdown.classList.remove('active');
+        }
+      });
+
+      // 阻止下拉菜单内部点击事件冒泡
+      if (dropdownMenu) {
+        dropdownMenu.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+      }
+    }
+  }
+
   // 初始化
   async init() {
     await this.loadHeader();
+    this.initUserDropdown();
   }
 }
 

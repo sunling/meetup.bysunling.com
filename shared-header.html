@@ -13,15 +13,25 @@
       <nav class="header-nav">
         <a href="/" class="nav-link" data-page="index">首页</a>
         <a href="new-meetup" class="nav-link" data-page="new-meetup">发起活动</a>
-        <a href="my-meetups" class="nav-link" data-page="my-meetups">我的活动</a>
         <a href="meetup-manage" class="nav-link" data-page="meetup-manage">管理</a>
       </nav>
       <div class="auth-section">
         <div id="auth-info" class="auth-info" style="display: none;">
-          <span id="user-name" class="user-name"></span>
-          <button id="logout-btn" class="logout-btn">退出</button>
+          <div class="user-dropdown">
+            <button class="user-dropdown-toggle" id="user-dropdown-toggle">
+              <span id="user-name" class="user-name"></span>
+              <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="user-dropdown-menu" id="user-dropdown-menu">
+              <a href="/my-meetups" class="dropdown-item">我发起的活动</a>
+              <button id="logout-btn" class="dropdown-item logout-item">退出登录</button>
+            </div>
+          </div>
         </div>
-        <a href="https://bysunling.com/auth?redirect=https://meetup.bysunling.com" id="login-btn" class="login-btn">登录</a>
+        <a href="https://bysunling.com/auth?redirect=https://meetup.bysunling.com" id="login-btn"
+          class="login-btn">登录</a>
       </div>
     </div>
   </div>

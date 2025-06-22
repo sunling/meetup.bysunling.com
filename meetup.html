@@ -7,6 +7,7 @@
   <title>活动详情</title>
   <link rel="stylesheet" href="./styles/shared.css">
   <script type="module" src="scripts/headerLoader.js"></script>
+  <script type="module" src="scripts/footerLoader.js"></script>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
@@ -718,21 +719,51 @@
     }
 
     // Check if an RSVP belongs to the current user
-    function isCurrentUserRsvp(item) {
+    async function isCurrentUserRsvp(item) {
+      // 首先尝试通过localStorage中的用户数据匹配
       const userData = getUserData();
-      if (!userData) return false;
+      if (userData && item.name === userData.name && item.wechat_id === userData.wechat) {
+        return true;
+      }
 
-      return item.name === userData.name && item.wechat_id === userData.wechat;
+      // 如果没有匹配，尝试通过已登录用户的username匹配
+      try {
+        const { authManager } = await import('./scripts/authManager.js');
+        const currentUser = await authManager.getCurrentUser();
+        if (currentUser && currentUser.username && item.username === currentUser.username) {
+          return true;
+        }
+      } catch (error) {
+        console.log('无法获取登录用户信息:', error);
+      }
+
+      return false;
     }
 
     // Get current user's RSVP if exists
-    function getCurrentUserRsvp() {
+    async function getCurrentUserRsvp() {
+      // 首先尝试通过localStorage中的用户数据匹配
       const userData = getUserData();
-      if (!userData) return null;
+      if (userData) {
+        const localMatch = allRsvps.find(item =>
+          item.name === userData.name && item.wechat_id === userData.wechat
+        );
+        if (localMatch) return localMatch;
+      }
 
-      return allRsvps.find(item =>
-        item.name === userData.name && item.wechat_id === userData.wechat
-      );
+      // 如果没有找到，尝试通过已登录用户的username匹配
+      try {
+        const { authManager } = await import('./scripts/authManager.js');
+        const currentUser = await authManager.getCurrentUser();
+        if (currentUser && currentUser.username) {
+          const usernameMatch = allRsvps.find(item => item.username === currentUser.username);
+          if (usernameMatch) return usernameMatch;
+        }
+      } catch (error) {
+        console.log('无法获取登录用户信息:', error);
+      }
+
+      return null;
     }
 
     // Open dialog with specified status
@@ -782,8 +813,8 @@
     }
 
     // Update the RSVP UI based on user's status
-    function updateRsvpUI() {
-      const userRsvp = getCurrentUserRsvp();
+    async function updateRsvpUI() {
+      const userRsvp = await getCurrentUserRsvp();
       const rsvpStatus = document.getElementById('rsvp-status');
       const cancelButton = document.getElementById('cancel-rsvp-button');
       const rsvpButtons = document.getElementById('rsvp-buttons');
@@ -911,8 +942,8 @@
         `;
 
         document.getElementById("rsvp-section").style.display = 'block';
-        updateRsvpUI();
-        renderRsvpList();
+        await updateRsvpUI();
+        await renderRsvpList();
 
         // 检查URL参数，如果有action参数则自动打开对应的对话框
         const urlParams = new URLSearchParams(window.location.search);
@@ -928,7 +959,7 @@
       }
     }
 
-    function renderRsvpList() {
+    async function renderRsvpList() {
       const attendeesSection = document.getElementById('attendees-section');
       const attendeesTitle = document.getElementById('attendees-title');
       const avatarsContainer = document.getElementById('attendee-avatars');
@@ -1001,7 +1032,7 @@
         goingRow.style.flexWrap = 'wrap';
         goingRow.style.marginBottom = '15px';
 
-        going.forEach(item => {
+        for (const item of going) {
           const avatar = document.createElement('div');
           avatar.className = 'avatar';
           avatar.textContent = item.name.charAt(0).toUpperCase();
@@ -1010,7 +1041,7 @@
           avatar.style.color = "white";
 
           // Highlight current user's avatar
-          if (isCurrentUserRsvp(item)) {
+          if (await isCurrentUserRsvp(item)) {
             avatar.style.width = '50px';
             avatar.style.height = '50px';
             avatar.style.border = '3px solid #FFD700';
@@ -1021,7 +1052,7 @@
           }
 
           goingRow.appendChild(avatar);
-        });
+        }
 
         avatarsContainer.appendChild(goingRow);
       }
@@ -1041,7 +1072,7 @@
         maybeRow.style.flexWrap = 'wrap';
         maybeRow.style.marginBottom = '15px';
 
-        maybe.forEach(item => {
+        for (const item of maybe) {
           const avatar = document.createElement('div');
           avatar.className = 'avatar';
           avatar.textContent = item.name.charAt(0).toUpperCase();
@@ -1050,7 +1081,7 @@
           avatar.style.color = '#333';
 
           // Highlight current user's avatar
-          if (isCurrentUserRsvp(item)) {
+          if (await isCurrentUserRsvp(item)) {
             avatar.style.width = '50px';
             avatar.style.height = '50px';
             avatar.style.border = '3px solid #FFD700';
@@ -1061,7 +1092,7 @@
           }
 
           maybeRow.appendChild(avatar);
-        });
+        }
 
         avatarsContainer.appendChild(maybeRow);
       }
@@ -1070,27 +1101,31 @@
     }
 
     async function cancelRsvp() {
-      const userData = getUserData();
-      if (!userData) return;
+      // 获取当前用户的RSVP记录
+      const userRsvp = await getCurrentUserRsvp();
+      if (!userRsvp) return;
 
       try {
         // 使用缓存API删除RSVP
         const { apiWithCache } = await import('./scripts/apiWithCache.js');
-        const result = await apiWithCache.deleteRsvp(meetup_id, userData.name, userData.wechat);
+        const result = await apiWithCache.deleteRsvp(meetup_id, userRsvp.name, userRsvp.wechat_id);
 
         if (result.success) {
           // 删除成功后更新UI
-          // Remove user data from localStorage
-          removeUserData();
+          // Remove user data from localStorage if it matches
+          const userData = getUserData();
+          if (userData && userData.name === userRsvp.name && userData.wechat === userRsvp.wechat_id) {
+            removeUserData();
+          }
 
           // Remove user from RSVP list
           allRsvps = allRsvps.filter(x =>
-            x.name !== userData.name || x.wechat_id !== userData.wechat
+            !(x.name === userRsvp.name && x.wechat_id === userRsvp.wechat_id)
           );
 
           // Update UI
-          updateRsvpUI();
-          renderRsvpList();
+          await updateRsvpUI();
+          await renderRsvpList();
 
           // Close dialog
           closeConfirmDialog();
@@ -1135,9 +1170,19 @@
       }
 
       try {
+        // 检查用户是否已登录，如果已登录则获取username
+        const { authManager } = await import('./scripts/authManager.js');
+        const currentUser = await authManager.getCurrentUser();
+        
+        // 构建提交数据
+        const submitData = { meetup_id, name, wechat_id: wechat, status };
+        if (currentUser && currentUser.username) {
+          submitData.username = currentUser.username;
+        }
+        
         // 使用缓存API提交RSVP
         const { apiWithCache } = await import('./scripts/apiWithCache.js');
-        const result = await apiWithCache.submitRsvp({ meetup_id, name, wechat_id: wechat, status });
+        const result = await apiWithCache.submitRsvp(submitData);
 
         if (result.success) {
           // 提交成功后更新UI
@@ -1161,8 +1206,8 @@
           }
 
           // Update UI
-          updateRsvpUI();
-          renderRsvpList();
+          await updateRsvpUI();
+          await renderRsvpList();
 
           // Close dialog after a short delay
           setTimeout(closeRsvpDialog, 1500);
@@ -1273,18 +1318,8 @@
   <!-- 悬浮新建活动按钮 -->
   <!-- <a href="new-meetup" class="floating-new-meetup" title="发起新活动">+</a> -->
 
-  <!-- Footer -->
-  <footer class="site-footer">
-    <div class="footer-container">
-      <div class="footer-simple">
-        <div class="footer-logo">
-          <img src="logo.svg" alt="聚友圈Logo" width="24" height="24">
-          <span class="footer-brand">聚友圈</span>
-        </div>
-        <p class="footer-text">&copy; 2025 聚友圈 - 愿每一次活动，都是一次靠近</p>
-      </div>
-    </div>
-  </footer>
+  <!-- 共享Footer容器 -->
+  <div id="shared-footer-container"></div>
 
   <!-- Auth Utils Script -->
   <script src="https://bysunling.com/scripts/auth-utils.js"></script>
@@ -1296,6 +1331,12 @@
       const authInfo = document.getElementById('auth-info');
       const loginBtn = document.getElementById('login-btn');
       const userNameSpan = document.getElementById('user-name');
+      
+      // 如果元素还没有加载，延迟执行
+      if (!authInfo || !loginBtn || !userNameSpan) {
+        setTimeout(checkAuthStatus, 100);
+        return;
+      }
       
       // 优先使用 crossDomainAuth，降级到 localStorage
       let token, user;
