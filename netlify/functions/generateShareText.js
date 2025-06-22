@@ -41,7 +41,7 @@ export const handler = async (event, context) => {
 
     // 解析请求体
     const { eventInfo, eventUrl } = JSON.parse(event.body);
-    
+
     if (!eventInfo || !eventUrl) {
       return {
         statusCode: 400,
@@ -99,7 +99,7 @@ ${eventInfo}
           'Access-Control-Allow-Origin': '*',
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           error: `AI服务调用失败: ${response.status}`,
           details: errorText
         })
@@ -115,7 +115,7 @@ ${eventInfo}
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         shareText: generatedText
       })
     };
@@ -128,7 +128,7 @@ ${eventInfo}
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         error: '生成分享文案失败',
         details: error.message
       })

@@ -189,6 +189,13 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 2rem;
+}
+
+.nav-auth-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
 }
 
 .logo-section {
@@ -300,6 +307,51 @@ body {
   font-size: 0.9rem;
 }
 
+/* Auth Section Styles */
+.auth-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.auth-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-name {
+  color: #2d3748;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.login-btn, .logout-btn {
+  background: transparent;
+  color: #333;
+  text-decoration: none;
+  padding: 0.6rem 1.4rem;
+  border-radius: 25px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover, .logout-btn:hover {
+  transform: translateY(-2px);
+  color: #000;
+}
+
+.logout-btn {
+  background: transparent;
+  color: #e53e3e;
+}
+
+.logout-btn:hover {
+  color: #c53030;
+}
+
 /* Responsive Design for Header and Footer */
 @media (max-width: 768px) {
   .header-container {
@@ -314,6 +366,16 @@ body {
   
   .header-nav {
     gap: 1rem;
+  }
+  
+  .auth-section {
+    order: -1;
+    margin-bottom: 0.5rem;
+  }
+
+  .login-btn, .logout-btn {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
   }
   
   .footer-simple {
