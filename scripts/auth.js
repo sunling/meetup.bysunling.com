@@ -43,9 +43,14 @@ class UnifiedAuth {
   /**
    * 等待 CrossDomainAuth 加载完成
    */
-  async waitForCrossDomainAuth(maxWait = 5000) {
+  async waitForCrossDomainAuth(maxWait = 3000) {
     const startTime = Date.now();
     while (!window.crossDomainAuth && !window.CrossDomainAuth && (Date.now() - startTime) < maxWait) {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+    
+    // 简短等待确保初始化完成
+    if (window.crossDomainAuth || window.CrossDomainAuth) {
       await new Promise(resolve => setTimeout(resolve, 100));
     }
   }
@@ -77,6 +82,9 @@ class UnifiedAuth {
           return { ...user, authToken: token };
         } catch (e) {
           console.warn('Failed to parse user from localStorage:', e);
+          // 清除损坏的数据
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
         }
       }
 
@@ -193,7 +201,7 @@ class UnifiedAuth {
    * 监听认证状态变化
    */
   setupAuthListener() {
-    // 监听 localStorage 变化
+    // 监听 localStorage 变化（用于多标签页同步）
     window.addEventListener('storage', (e) => {
       if (e.key === 'authToken' || e.key === 'user') {
         this.checkAndUpdateAuthUI();
@@ -203,9 +211,57 @@ class UnifiedAuth {
     // 监听页面可见性变化，当页面重新可见时检查认证状态
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) {
-        this.checkAndUpdateAuthUI();
+        // 页面重新可见时，简短延迟后检查认证状态
+        setTimeout(() => {
+          this.checkAndUpdateAuthUI();
+        }, 200);
       }
     });
+  }
+
+  /**
+   * 检查URL参数，处理登录回调
+   */
+  checkLoginCallback() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const userInfo = urlParams.get('user');
+    const loginSuccess = urlParams.get('login');
+    
+    // 处理带token和user参数的回调（类似cards.bysunling.com）
+    if (token && userInfo) {
+      try {
+        // 解码用户信息
+        const user = JSON.parse(decodeURIComponent(userInfo));
+        
+        // 保存认证信息
+        this.saveAuth(token, user);
+        
+        // 清除URL参数
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+        
+        // 立即更新UI
+        this.checkAndUpdateAuthUI();
+        
+        console.log('登录成功，欢迎回来！');
+        return;
+      } catch (error) {
+        console.error('处理登录回调失败:', error);
+      }
+    }
+    
+    // 处理login=success参数的回调
+    if (loginSuccess === 'success') {
+      // 登录成功回调，清理URL参数
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+      
+      // 延迟检查认证状态
+      setTimeout(() => {
+        this.checkAndUpdateAuthUI();
+      }, 500);
+    }
   }
 
   /**
@@ -213,6 +269,9 @@ class UnifiedAuth {
    */
   async autoInit() {
     await this.init();
+    
+    // 检查登录回调
+    this.checkLoginCallback();
     
     // 检查并更新UI
     await this.checkAndUpdateAuthUI();
