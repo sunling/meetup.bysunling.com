@@ -107,35 +107,27 @@
 
     .tab-button {
       flex: 1;
-      padding: 1em 1.5em;
-      background: transparent;
+      background: none;
       border: none;
+      padding: 0.75rem 1.5rem;
       cursor: pointer;
-      font-size: 0.95em;
+      font-size: 1rem;
       font-weight: 500;
-      color: #666;
-      transition: all 0.3s ease;
+      color: var(--text-light);
+      border-bottom: 2px solid transparent;
+      transition: all var(--transition-fast);
       position: relative;
     }
 
     .tab-button:hover {
-      background: #f8f9fa;
-      color: #333;
+      color: var(--primary-color);
+      background: rgba(255, 107, 157, 0.05);
     }
 
     .tab-button.active {
-      color: #667eea;
-      background: #f8f9ff;
-    }
-
-    .tab-button.active::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: var(--primary-color);
+      border-bottom-color: var(--primary-color);
+      background: rgba(255, 107, 157, 0.08);
     }
 
     .tab-content {
@@ -455,7 +447,7 @@
                 ${statusInfo.text}
               </div>
             </div>
-            <a href="${manageUrl}" class="btn ">
+            <a href="${manageUrl}" class="btn btn-dopamine">
               管理
             </a>
           </div>
@@ -481,7 +473,7 @@
                 ${meetup.rsvp_count || 0} 人报名
               </div>
               <div class="stat-item">
-                发起人：${meetup.organizer || '未知'}
+                发起人：${meetup.creator || '未知'}
               </div>
             </div>
             <a href="${meetupUrl}" class="manage-btn">
@@ -547,9 +539,14 @@
 
       try {
         const { apiWithCache } = await import('./scripts/apiWithCache.js');
-        const meetups = await apiWithCache.getUserInterestedMeetups(currentUser.username);
+        const rsvpData = await apiWithCache.getUserInterestedMeetups(currentUser.username);
         
-        if (meetups && meetups.length > 0) {
+        if (rsvpData && rsvpData.length > 0) {
+          // 提取嵌套的meetups数据
+          const meetups = rsvpData.map(rsvp => ({
+            ...rsvp.meetups,
+            rsvp_count: rsvp.rsvp_count
+          }));
           const meetupsHtml = meetups.map(meetup => createParticipantMeetupCard(meetup)).join('');
           document.getElementById('interested-meetups').innerHTML = meetupsHtml;
         } else {
@@ -570,9 +567,14 @@
 
       try {
         const { apiWithCache } = await import('./scripts/apiWithCache.js');
-        const meetups = await apiWithCache.getUserRegisteredMeetups(currentUser.username);
+        const rsvpData = await apiWithCache.getUserRegisteredMeetups(currentUser.username);
         
-        if (meetups && meetups.length > 0) {
+        if (rsvpData && rsvpData.length > 0) {
+          // 提取嵌套的meetups数据
+          const meetups = rsvpData.map(rsvp => ({
+            ...rsvp.meetups,
+            rsvp_count: rsvp.rsvp_count
+          }));
           const meetupsHtml = meetups.map(meetup => createParticipantMeetupCard(meetup)).join('');
           document.getElementById('registered-meetups').innerHTML = meetupsHtml;
         } else {
@@ -642,8 +644,34 @@
       }
     }
 
+    // 监听登录状态变化
+    function setupAuthStateListener() {
+      // 监听 localStorage 变化（用于多标签页同步）
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'authToken' || e.key === 'user') {
+          // 登录状态发生变化，重新初始化页面
+          setTimeout(() => {
+            initPage();
+          }, 100);
+        }
+      });
+
+      // 监听页面可见性变化
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          // 页面重新可见时，检查登录状态
+          setTimeout(() => {
+            initPage();
+          }, 200);
+        }
+      });
+    }
+
     // 页面加载完成后初始化
-    document.addEventListener('DOMContentLoaded', initPage);
+    document.addEventListener('DOMContentLoaded', () => {
+      initPage();
+      setupAuthStateListener();
+    });
   </script>
   
   <!-- Unified Auth Script -->

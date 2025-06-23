@@ -765,7 +765,7 @@
     }
 
     // Open dialog with specified status
-    function openRsvpDialog(status) {
+    async function openRsvpDialog(status) {
       statusInput.value = status;
       dialogTitle.textContent = status === 'going' ? '确定参加' : '感兴趣';
       document.getElementById('rsvp-message').textContent = '';
@@ -785,11 +785,29 @@
 
       // Pre-fill with user data if available
       const userData = getUserData();
+      let nameField = document.getElementById('name');
+      let wechatField = document.getElementById('wechat');
+      
       if (userData) {
-        document.getElementById('name').value = userData.name;
-        document.getElementById('wechat').value = userData.wechat;
+        nameField.value = userData.name;
+        wechatField.value = userData.wechat;
       } else {
-        document.getElementById('rsvp-form').reset();
+        // 如果没有本地用户数据，尝试使用当前登录用户的信息
+        try {
+          const currentUser = await window.unifiedAuth.getCurrentUser();
+          if (currentUser && currentUser.name) {
+            nameField.value = currentUser.name;
+            // 如果有微信号信息也自动填充
+            if (currentUser.wechat) {
+              wechatField.value = currentUser.wechat;
+            }
+          } else {
+            document.getElementById('rsvp-form').reset();
+          }
+        } catch (error) {
+          console.log('无法获取登录用户信息:', error);
+          document.getElementById('rsvp-form').reset();
+        }
       }
 
       dialog.classList.add('visible');
@@ -819,6 +837,16 @@
       const goingButton = document.getElementById('going-button');
       const maybeButton = document.getElementById('maybe-button');
 
+      // 检查用户登录状态
+      let isLoggedIn = false;
+      try {
+        const currentUser = await window.unifiedAuth.getCurrentUser();
+        isLoggedIn = !!(currentUser && currentUser.username);
+      } catch (error) {
+        console.log('无法获取登录用户信息:', error);
+        isLoggedIn = false;
+      }
+
       if (userRsvp) {
         // User has an RSVP
         rsvpStatus.innerHTML = userRsvp.status === 'going' ?
@@ -826,33 +854,45 @@
           '你已表示对此活动感兴趣';
         rsvpStatus.className = 'rsvp-status success';
 
-        // Show appropriate status button
         if (userRsvp.status === 'going') {
+          // 用户已确定报名：只显示取消报名按钮
           goingButton.style.display = 'none';
           maybeButton.style.display = 'none';
+          cancelButton.textContent = '取消我的报名';
+          cancelButton.style.display = 'block';
+          rsvpButtons.style.display = 'none';
         } else {
+          // 用户感兴趣：显示确定报名按钮和取消感兴趣按钮
           goingButton.style.display = 'block';
+          goingButton.textContent = '确定报名';
           maybeButton.style.display = 'none';
+          cancelButton.textContent = '取消感兴趣';
+          cancelButton.style.display = 'block';
+          rsvpButtons.style.display = 'none';
         }
-
-        // Update cancel button text based on status
-        cancelButton.textContent = userRsvp.status === 'going' ? '取消我的报名' : '取消感兴趣';
-        cancelButton.style.display = 'block';
-        rsvpButtons.style.display = 'none';
 
         // Show QR code section only when user is going
         if (qrCodeSection) {
           qrCodeSection.style.display = userRsvp.status === 'going' ? 'block' : 'none';
         }
       } else {
-        // User has no RSVP
+        // User has no RSVP - 根据登录状态显示按钮
         rsvpStatus.textContent = '';
         rsvpStatus.className = 'rsvp-status';
 
-        goingButton.style.display = 'none';
-        maybeButton.style.display = 'none';
-        cancelButton.style.display = 'none';
-        rsvpButtons.style.display = 'flex';
+        if (isLoggedIn) {
+          // 已登录用户：显示完整的报名按钮组
+          goingButton.style.display = 'none';
+          maybeButton.style.display = 'none';
+          cancelButton.style.display = 'none';
+          rsvpButtons.style.display = 'flex';
+        } else {
+          // 未登录用户：也显示完整的报名按钮组（保持原有行为）
+          goingButton.style.display = 'none';
+          maybeButton.style.display = 'none';
+          cancelButton.style.display = 'none';
+          rsvpButtons.style.display = 'flex';
+        }
 
         // Hide QR code section when user has no RSVP
         if (qrCodeSection) {
@@ -1219,20 +1259,20 @@
     }
 
     // Event listeners
-    document.getElementById("going-button-small").addEventListener("click", () => {
-      openRsvpDialog('going');
+    document.getElementById("going-button-small").addEventListener("click", async () => {
+      await openRsvpDialog('going');
     });
 
-    document.getElementById("maybe-button-small").addEventListener("click", () => {
-      openRsvpDialog('maybe');
+    document.getElementById("maybe-button-small").addEventListener("click", async () => {
+      await openRsvpDialog('maybe');
     });
 
-    document.getElementById("going-button").addEventListener("click", () => {
-      openRsvpDialog('going');
+    document.getElementById("going-button").addEventListener("click", async () => {
+      await openRsvpDialog('going');
     });
 
-    document.getElementById("maybe-button").addEventListener("click", () => {
-      openRsvpDialog('maybe');
+    document.getElementById("maybe-button").addEventListener("click", async () => {
+      await openRsvpDialog('maybe');
     });
 
     document.getElementById("cancel-rsvp-button").addEventListener("click", () => {
