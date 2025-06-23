@@ -1106,7 +1106,7 @@
       try {
         // 使用缓存API删除RSVP
         const { apiWithCache } = await import('./scripts/apiWithCache.js');
-        const result = await apiWithCache.deleteRsvp(meetup_id, userRsvp.name, userRsvp.wechat_id);
+        const result = await apiWithCache.deleteRsvp(meetup_id, userRsvp.name, userRsvp.wechat_id, userRsvp.username);
 
         if (result.success) {
           // 删除成功后更新UI

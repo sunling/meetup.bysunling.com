@@ -112,6 +112,11 @@ class ApiWithCache {
     cacheManager.delete('meetups');
     cacheManager.delete('meetupDetails', { id: rsvpData.meetup_id });
     cacheManager.delete('rsvpCounts', { meetup_id: rsvpData.meetup_id });
+    // 清除用户RSVP缓存
+    if (rsvpData.username) {
+      cacheManager.delete('userRsvps', { username: rsvpData.username });
+      cacheManager.delete('userRsvps', { username: rsvpData.username, status: rsvpData.status });
+    }
     
     return result;
   }
@@ -119,7 +124,7 @@ class ApiWithCache {
   /**
    * 删除RSVP（清除相关缓存）
    */
-  async deleteRsvp(meetupId, name, wechatId) {
+  async deleteRsvp(meetupId, name, wechatId, username = null) {
     const result = await this.apiCall(`${this.baseUrl}/.netlify/functions/deleteRsvp`, {
       method: 'POST',
       body: JSON.stringify({ meetup_id: meetupId, name, wechat_id: wechatId })
@@ -129,6 +134,12 @@ class ApiWithCache {
     cacheManager.delete('meetups');
     cacheManager.delete('meetupDetails', { id: meetupId });
     cacheManager.delete('rsvpCounts', { meetup_id: meetupId });
+    // 清除用户RSVP缓存
+    if (username) {
+      cacheManager.delete('userRsvps', { username });
+      cacheManager.delete('userRsvps', { username, status: 'going' });
+      cacheManager.delete('userRsvps', { username, status: 'maybe' });
+    }
     
     return result;
   }
@@ -182,6 +193,41 @@ class ApiWithCache {
       () => this.apiCall(`${this.baseUrl}/.netlify/functions/getUserMeetups?${queryString}`),
       { creator }
     );
+  }
+
+  /**
+   * 获取用户的RSVP记录（感兴趣和已报名的活动）
+   */
+  async getUserRsvps(username, status = null) {
+    if (!username) {
+      throw new Error('Username parameter is required');
+    }
+    
+    const params = { username };
+    if (status) {
+      params.status = status;
+    }
+    
+    const queryString = new URLSearchParams(params).toString();
+    return cacheManager.withCache(
+      'userRsvps',
+      () => this.apiCall(`${this.baseUrl}/.netlify/functions/getUserRsvps?${queryString}`),
+      params
+    );
+  }
+
+  /**
+   * 获取用户感兴趣的活动
+   */
+  async getUserInterestedMeetups(username) {
+    return this.getUserRsvps(username, 'maybe');
+  }
+
+  /**
+   * 获取用户已报名的活动
+   */
+  async getUserRegisteredMeetups(username) {
+    return this.getUserRsvps(username, 'going');
   }
 
   /**

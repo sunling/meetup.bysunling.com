@@ -28,7 +28,7 @@ export async function handler(event, context) {
     // 获取用户发起的活动
     const { data: meetups, error: meetupsError } = await supabase
       .from('meetups')
-      .select('id, title, datetime, location, description, qrcode, status, creator')
+      .select('id, title, datetime, location, description, qrcode, status, creator, manage_token')
       .eq('creator', creator)
       .order('datetime', { ascending: false });
 

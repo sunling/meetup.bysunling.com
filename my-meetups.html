@@ -361,26 +361,22 @@
     <!-- 未登录状态 -->
     <div id="login-prompt" class="login-prompt" style="display: none;">
       <h2>请先登录</h2>
-      <p>登录后即可查看您发起的所有活动</p>
-      <a href="https://bysunling.com/auth?redirect=https://meetup.bysunling.com/my-meetups" class="login-btn">立即登录</a>
+      <p>登录后即可查看您发起和参与的活动</p>
+      <a href="https://bysunling.com/auth?redirect=https://meetup.bysunling.com/my-meetups" class="btn btn-primary">立即登录</a>
     </div>
 
     <!-- 已登录状态 -->
     <div id="user-content" style="display: none;">
-      <div id="user-info" class="user-info">
-        <h2 id="welcome-text">欢迎回来！</h2>
-        <p>这里是您的活动管理中心</p>
-      </div>
 
       <div id="loading" class="loading">
-        <p>正在加载您的活动...</p>
+        <p>正在加载您发起和报名的活动...</p>
       </div>
 
       <div id="tabs-container" class="tabs-container" style="display: none;">
         <div class="tabs-nav">
           <button class="tab-button active" data-tab="created">我发起的活动</button>
-          <button class="tab-button" data-tab="interested" style="display: none;">我感兴趣的活动</button>
-          <button class="tab-button" data-tab="registered" style="display: none;">我已报名的活动</button>
+          <button class="tab-button" data-tab="interested">我感兴趣的活动</button>
+          <button class="tab-button" data-tab="registered">我已报名的活动</button>
         </div>
         
         <div class="tab-content">
@@ -398,7 +394,7 @@
             <div id="interested-empty" class="empty-state" style="display: none;">
               <h3>还没有感兴趣的活动</h3>
               <p>去发现一些有趣的活动吧！</p>
-              <a href="index" class="create-meetup-btn">浏览活动</a>
+              <a href="/" class="create-meetup-btn">浏览活动</a>
             </div>
           </div>
           
@@ -407,7 +403,7 @@
             <div id="registered-empty" class="empty-state" style="display: none;">
               <h3>还没有报名参加活动</h3>
               <p>去找一些感兴趣的活动报名参加吧！</p>
-              <a href="index" class="create-meetup-btn">浏览活动</a>
+              <a href="/" class="create-meetup-btn">浏览活动</a>
             </div>
           </div>
         </div>
@@ -447,20 +443,20 @@
         <div class="meetup-card">
           <div class="meetup-title">${meetup.title}</div>
           <div class="meetup-meta">
-            📅 ${formattedDate} | 📍 ${meetup.location}
+            ${formattedDate} | ${meetup.location}
           </div>
           <div class="meetup-description">${meetup.description}</div>
           <div class="meetup-stats">
             <div class="stats-left">
               <div class="stat-item">
-                👥 ${meetup.rsvp_count || 0} 人报名
+                ${meetup.rsvp_count || 0} 人报名
               </div>
               <div class="status-badge ${statusInfo.class}">
                 ${statusInfo.text}
               </div>
             </div>
-            <a href="${manageUrl}" class="manage-btn">
-              ⚙️ 管理
+            <a href="${manageUrl}" class="btn ">
+              管理
             </a>
           </div>
         </div>
@@ -476,20 +472,20 @@
         <div class="meetup-card">
           <div class="meetup-title">${meetup.title}</div>
           <div class="meetup-meta">
-            📅 ${formattedDate} | 📍 ${meetup.location}
+            ${formattedDate} | ${meetup.location}
           </div>
           <div class="meetup-description">${meetup.description}</div>
           <div class="meetup-stats">
             <div class="stats-left">
               <div class="stat-item">
-                👥 ${meetup.rsvp_count || 0} 人报名
+                ${meetup.rsvp_count || 0} 人报名
               </div>
               <div class="stat-item">
-                👤 发起人：${meetup.organizer || '未知'}
+                发起人：${meetup.organizer || '未知'}
               </div>
             </div>
             <a href="${meetupUrl}" class="manage-btn">
-              📖 查看详情
+              查看详情
             </a>
           </div>
         </div>
@@ -551,8 +547,7 @@
 
       try {
         const { apiWithCache } = await import('./scripts/apiWithCache.js');
-        // 这里需要调用获取感兴趣活动的API，暂时使用空数组
-        const meetups = [];
+        const meetups = await apiWithCache.getUserInterestedMeetups(currentUser.username);
         
         if (meetups && meetups.length > 0) {
           const meetupsHtml = meetups.map(meetup => createParticipantMeetupCard(meetup)).join('');
@@ -575,8 +570,7 @@
 
       try {
         const { apiWithCache } = await import('./scripts/apiWithCache.js');
-        // 这里需要调用获取已报名活动的API，暂时使用空数组
-        const meetups = [];
+        const meetups = await apiWithCache.getUserRegisteredMeetups(currentUser.username);
         
         if (meetups && meetups.length > 0) {
           const meetupsHtml = meetups.map(meetup => createParticipantMeetupCard(meetup)).join('');
@@ -610,10 +604,9 @@
       const interestedTab = document.querySelector('[data-tab="interested"]');
       const registeredTab = document.querySelector('[data-tab="registered"]');
       
-      // 这里可以根据实际数据来决定是否显示标签页
-      // 暂时先隐藏，等有数据时再显示
-      // interestedTab.style.display = 'block';
-      // registeredTab.style.display = 'block';
+      // 默认显示所有标签页
+      if (interestedTab) interestedTab.style.display = 'block';
+      if (registeredTab) registeredTab.style.display = 'block';
     }
 
     // 初始化页面
@@ -627,8 +620,8 @@
         document.getElementById('user-content').style.display = 'block';
         
         // 更新欢迎信息
-        const welcomeText = document.getElementById('welcome-text');
-        welcomeText.textContent = `欢迎回来，${currentUser.name || currentUser.username}！`;
+        // const welcomeText = document.getElementById('welcome-text');
+        // welcomeText.textContent = `欢迎回来，${currentUser.name || currentUser.username}！`;
         
         // 初始化标签页
         initTabs();
