@@ -100,11 +100,33 @@ class AuthManager {
 
   // 登出
   logout() {
+    // 使用跨域名认证工具清除登录状态
+    if (window.crossDomainAuth) {
+      window.crossDomainAuth.clearAuth();
+    } else if (typeof CrossDomainAuth !== 'undefined') {
+      // 如果有 CrossDomainAuth 类，创建实例并清除
+      try {
+        const crossDomainAuth = new CrossDomainAuth();
+        crossDomainAuth.clearAuth();
+      } catch (e) {
+        console.error('Failed to clear auth with CrossDomainAuth:', e);
+      }
+    }
+    
+    // 降级方案：清除本地登录状态
     this.currentUser = null;
     localStorage.removeItem('currentUser');
     localStorage.removeItem('userToken');
     localStorage.removeItem('isAdmin');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    
     this.updateUI();
+    
+    // 刷新页面以确保完全清除状态
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
   }
 
   // 更新UI显示
