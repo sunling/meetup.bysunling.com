@@ -13,6 +13,9 @@ class AuthManager {
     if (this.initialized) return;
     
     try {
+      // 等待 CrossDomainAuth 加载完成
+      await this.waitForCrossDomainAuth();
+      
       // 从URL参数中获取用户信息
       const urlParams = new URLSearchParams(window.location.search);
       const userParam = urlParams.get('user');
@@ -22,8 +25,10 @@ class AuthManager {
           const userData = JSON.parse(decodeURIComponent(userParam));
           this.currentUser = userData;
           
-          // 将用户信息存储到localStorage
-          localStorage.setItem('currentUser', JSON.stringify(userData));
+          // 使用 CrossDomainAuth 保存认证信息
+          if (window.crossDomainAuth && userData.authToken) {
+            window.crossDomainAuth.saveAuth(userData.authToken, userData);
+          }
           
           // 清理URL参数
           const newUrl = new URL(window.location);
@@ -33,23 +38,10 @@ class AuthManager {
           console.error('Failed to parse user data from URL:', e);
         }
       } else {
-        // 尝试从主域名 cookie 中获取认证信息
+        // 优先从 CrossDomainAuth 获取认证信息
         const authFromCookie = this.getAuthFromCookie();
         if (authFromCookie) {
           this.currentUser = authFromCookie;
-          // 同步到localStorage
-          localStorage.setItem('currentUser', JSON.stringify(authFromCookie));
-        } else {
-          // 从localStorage获取用户信息
-          const storedUser = localStorage.getItem('currentUser');
-          if (storedUser) {
-            try {
-              this.currentUser = JSON.parse(storedUser);
-            } catch (e) {
-              console.error('Failed to parse stored user data:', e);
-              localStorage.removeItem('currentUser');
-            }
-          }
         }
       }
       
@@ -61,11 +53,30 @@ class AuthManager {
     }
   }
 
+  // 等待 CrossDomainAuth 加载完成
+  async waitForCrossDomainAuth(maxWait = 5000) {
+    const startTime = Date.now();
+    while (!window.crossDomainAuth && (Date.now() - startTime) < maxWait) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+
   // 从主域名 cookie 中获取认证信息
   getAuthFromCookie() {
     try {
-      // 使用 CrossDomainAuth 实例获取认证信息
-      if (typeof CrossDomainAuth !== 'undefined') {
+      // 优先使用全局 crossDomainAuth 实例
+      if (window.crossDomainAuth) {
+        const token = window.crossDomainAuth.getToken();
+        const user = window.crossDomainAuth.getUser();
+        if (token && user) {
+          return {
+            ...user,
+            authToken: token
+          };
+        }
+      }
+      // 降级：使用 CrossDomainAuth 类创建实例
+      else if (typeof CrossDomainAuth !== 'undefined') {
         const crossDomainAuth = new CrossDomainAuth();
         const token = crossDomainAuth.getToken();
         const user = crossDomainAuth.getUser();
@@ -113,8 +124,10 @@ class AuthManager {
       }
     }
     
-    // 降级方案：清除本地登录状态
+    // 清除本地状态
     this.currentUser = null;
+    
+    // 降级方案：清除可能存在的本地存储
     localStorage.removeItem('currentUser');
     localStorage.removeItem('userToken');
     localStorage.removeItem('isAdmin');
