@@ -977,71 +977,8 @@
   <!-- Auth Utils Script -->
   <script src="https://bysunling.com/scripts/auth-utils.js"></script>
   
-  <!-- Auth Functionality Script -->
-  <script>
-    // 检查登录状态
-    function checkAuthStatus() {
-      const authInfo = document.getElementById('auth-info');
-      const loginBtn = document.getElementById('login-btn');
-      const userNameSpan = document.getElementById('user-name');
-      
-      // 优先使用 crossDomainAuth，降级到 localStorage
-      let token, user;
-      if (window.crossDomainAuth) {
-        token = window.crossDomainAuth.getToken();
-        user = window.crossDomainAuth.getUser();
-      } else {
-        token = localStorage.getItem('authToken');
-        user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
-      }
-      
-      if (token && user) {
-        // 已登录状态
-        authInfo.style.display = 'flex';
-        loginBtn.style.display = 'none';
-        userNameSpan.textContent = user.username || user.email || '用户';
-      } else {
-        // 未登录状态
-        authInfo.style.display = 'none';
-        loginBtn.style.display = 'inline-block';
-      }
-    }
-    
-    // 退出登录
-    function logout() {
-      // 优先使用 crossDomainAuth，降级到 localStorage
-      if (window.crossDomainAuth) {
-        window.crossDomainAuth.clearAuth();
-      } else {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
-      }
-      
-      // 更新UI
-      checkAuthStatus();
-      
-      // 可选：重新加载页面或重定向
-      window.location.reload();
-    }
-    
-    // 绑定事件监听器
-    document.addEventListener('DOMContentLoaded', function() {
-      checkAuthStatus();
-      
-      // 绑定退出按钮事件
-      const logoutBtn = document.getElementById('logout-btn');
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', logout);
-      }
-    });
-    
-    // 监听认证状态变化（如果有其他页面更新了认证状态）
-    window.addEventListener('storage', function(e) {
-      if (e.key === 'authToken' || e.key === 'user') {
-        checkAuthStatus();
-      }
-    });
-  </script>
+  <!-- Unified Auth Script -->
+  <script type="module" src="./scripts/auth.js"></script>
 
 </body>
 

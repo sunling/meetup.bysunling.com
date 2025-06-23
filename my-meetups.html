@@ -422,8 +422,6 @@
   <script type="module" src="scripts/cacheManager.js"></script>
   <script type="module" src="scripts/apiWithCache.js"></script>
   <script type="module">
-    import { authManager } from './scripts/authManager.js';
-
     let currentUser = null;
 
     // 格式化活动状态
@@ -621,7 +619,7 @@
     // 初始化页面
     async function initPage() {
       // 检查用户登录状态
-      currentUser = await authManager.getCurrentUser();
+      currentUser = await window.unifiedAuth.getCurrentUser();
       
       if (currentUser) {
         // 已登录，显示用户内容
@@ -654,6 +652,9 @@
     // 页面加载完成后初始化
     document.addEventListener('DOMContentLoaded', initPage);
   </script>
+  
+  <!-- Unified Auth Script -->
+  <script type="module" src="./scripts/auth.js"></script>
 </body>
 
 </html>
