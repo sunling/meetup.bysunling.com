@@ -90,11 +90,37 @@ class HeaderLoader {
     }
   }
 
+  // 等待统一认证系统加载
+  async waitForUnifiedAuth(maxWait = 3000) {
+    const startTime = Date.now();
+    while (!window.unifiedAuth && (Date.now() - startTime) < maxWait) {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+  }
+
   // 根据用户状态更新导航显示
-  updateNavForUserStatus() {
-    // 检查用户登录状态
-    const isLoggedIn = localStorage.getItem('userToken') || 
-                      new URLSearchParams(window.location.search).get('token');
+  async updateNavForUserStatus() {
+    // 等待统一认证系统加载
+    await this.waitForUnifiedAuth();
+    
+    // 检查用户登录状态 - 使用统一认证系统
+    let isLoggedIn = false;
+    
+    // 优先使用统一认证系统检查
+    if (window.unifiedAuth) {
+      try {
+        isLoggedIn = await window.unifiedAuth.isLoggedIn();
+      } catch (error) {
+        console.warn('Failed to check login status with unifiedAuth:', error);
+        // 降级到localStorage检查
+        isLoggedIn = !!(localStorage.getItem('authToken') || localStorage.getItem('userToken'));
+      }
+    } else {
+      // 降级方案：检查多种可能的token存储
+      isLoggedIn = !!(localStorage.getItem('authToken') || 
+                     localStorage.getItem('userToken') || 
+                     new URLSearchParams(window.location.search).get('token'));
+    }
     
     // 检查管理员权限
     const isAdmin = localStorage.getItem('isAdmin') === 'true';
@@ -121,13 +147,32 @@ class HeaderLoader {
   // 初始化
   async init() {
     await this.loadHeader();
-    this.updateNavForUserStatus();
+    await this.updateNavForUserStatus();
     this.initUserDropdown();
     
     // 监听localStorage变化，动态更新导航
     window.addEventListener('storage', () => {
       this.updateNavForUserStatus();
     });
+    
+    // 等待统一认证系统加载后设置监听器
+    await this.waitForUnifiedAuth();
+    if (window.unifiedAuth) {
+      // 监听认证状态变化
+      const checkAuthChange = async () => {
+        await this.updateNavForUserStatus();
+      };
+      
+      // 监听页面可见性变化
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          setTimeout(checkAuthChange, 200);
+        }
+      });
+      
+      // 定期检查认证状态变化（降低频率）
+      setInterval(checkAuthChange, 2000);
+    }
   }
 }
 
