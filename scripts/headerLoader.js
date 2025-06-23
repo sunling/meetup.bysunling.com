@@ -90,10 +90,44 @@ class HeaderLoader {
     }
   }
 
+  // 根据用户状态更新导航显示
+  updateNavForUserStatus() {
+    // 检查用户登录状态
+    const isLoggedIn = localStorage.getItem('userToken') || 
+                      new URLSearchParams(window.location.search).get('token');
+    
+    // 检查管理员权限
+    const isAdmin = localStorage.getItem('isAdmin') === 'true';
+    
+    // 显示/隐藏访客专属导航（未登录用户）
+    const guestOnlyLinks = document.querySelectorAll('.guest-only');
+    guestOnlyLinks.forEach(link => {
+      link.style.display = isLoggedIn ? 'none' : 'block';
+    });
+    
+    // 显示/隐藏用户专属导航
+    const userOnlyLinks = document.querySelectorAll('.user-only');
+    userOnlyLinks.forEach(link => {
+      link.style.display = isLoggedIn ? 'block' : 'none';
+    });
+    
+    // 显示/隐藏管理员专属导航
+    const adminOnlyLinks = document.querySelectorAll('.admin-only');
+    adminOnlyLinks.forEach(link => {
+      link.style.display = isAdmin ? 'block' : 'none';
+    });
+  }
+
   // 初始化
   async init() {
     await this.loadHeader();
+    this.updateNavForUserStatus();
     this.initUserDropdown();
+    
+    // 监听localStorage变化，动态更新导航
+    window.addEventListener('storage', () => {
+      this.updateNavForUserStatus();
+    });
   }
 }
 

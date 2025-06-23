@@ -22,7 +22,7 @@
     }
 
     .container {
-      max-width: 800px;
+      max-width: 800px !important;
       margin: 0 auto;
       padding: 2em 1.5em;
       flex: 1;
@@ -311,7 +311,7 @@
     // 创建活动卡片
     function createMeetupCard(meetup) {
       const statusInfo = formatStatus(meetup.status);
-      const formattedDate = TimeUtils.formatDateTime(meetup.datetime);
+      const formattedDate = TimeUtils.formatDateTimeForDisplay(meetup.datetime);
       
       // 构建管理链接，优先使用 manage_token，如果没有则使用 id
       const manageToken = meetup.manage_token || meetup.id;
