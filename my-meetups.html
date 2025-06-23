@@ -22,10 +22,12 @@
     }
 
     .container {
-      max-width: 800px !important;
+      width: 100%;
+      max-width: 800px;
       margin: 0 auto;
       padding: 2em 1.5em;
       flex: 1;
+      box-sizing: border-box;
     }
 
     .page-title {
@@ -90,8 +92,69 @@
       color: #666;
     }
 
-    .meetups-section {
+    .tabs-container {
       margin-top: 2em;
+    }
+
+    .tabs-nav {
+      display: flex;
+      background: white;
+      border-radius: 12px 12px 0 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    .tab-button {
+      flex: 1;
+      padding: 1em 1.5em;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95em;
+      font-weight: 500;
+      color: #666;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .tab-button:hover {
+      background: #f8f9fa;
+      color: #333;
+    }
+
+    .tab-button.active {
+      color: #667eea;
+      background: #f8f9ff;
+    }
+
+    .tab-button.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .tab-content {
+      background: white;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      min-height: 200px;
+    }
+
+    .tab-pane {
+      display: none;
+      padding: 1.5em;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    .meetups-section {
+      margin-top: 0;
     }
 
     .section-title {
@@ -226,7 +289,27 @@
     }
 
     @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
       .container {
+        padding: 1em;
+        margin: 0;
+        width: 100%;
+        max-width: none;
+      }
+
+      .page-title {
+        font-size: 1.5em;
+      }
+
+      .login-prompt {
+        padding: 2em 1.5em;
+        margin: 1em 0;
+      }
+
+      .user-info {
         padding: 1em;
       }
 
@@ -245,6 +328,23 @@
         align-self: flex-end;
         font-size: 0.8em;
         padding: 0.4em 0.8em;
+      }
+
+      .tabs-nav {
+        flex-direction: column;
+      }
+
+      .tab-button {
+        padding: 0.8em 1em;
+        font-size: 0.9em;
+      }
+
+      .tab-content {
+        border-radius: 12px;
+      }
+
+      .tab-pane {
+        padding: 1em;
       }
     }
   </style>
@@ -268,21 +368,48 @@
     <div id="user-content" style="display: none;">
       <div id="user-info" class="user-info">
         <h2 id="welcome-text">欢迎回来！</h2>
-        <p>这里是您发起的所有活动</p>
+        <p>这里是您的活动管理中心</p>
       </div>
 
       <div id="loading" class="loading">
         <p>正在加载您的活动...</p>
       </div>
 
-      <div id="meetups-container" class="meetups-section" style="display: none;">
-        <div id="meetups-list"></div>
-      </div>
-
-      <div id="empty-state" class="empty-state" style="display: none;">
-        <h3>还没有发起过活动</h3>
-        <p>快来发起您的第一个活动，与志同道合的朋友相聚吧！</p>
-        <a href="new-meetup" class="create-meetup-btn">发起活动</a>
+      <div id="tabs-container" class="tabs-container" style="display: none;">
+        <div class="tabs-nav">
+          <button class="tab-button active" data-tab="created">我发起的活动</button>
+          <button class="tab-button" data-tab="interested" style="display: none;">我感兴趣的活动</button>
+          <button class="tab-button" data-tab="registered" style="display: none;">我已报名的活动</button>
+        </div>
+        
+        <div class="tab-content">
+          <div id="created-tab" class="tab-pane active">
+            <div id="created-meetups" class="meetups-section"></div>
+            <div id="created-empty" class="empty-state" style="display: none;">
+              <h3>还没有发起过活动</h3>
+              <p>快来发起您的第一个活动，与志同道合的朋友相聚吧！</p>
+              <a href="new-meetup" class="create-meetup-btn">发起活动</a>
+            </div>
+          </div>
+          
+          <div id="interested-tab" class="tab-pane">
+            <div id="interested-meetups" class="meetups-section"></div>
+            <div id="interested-empty" class="empty-state" style="display: none;">
+              <h3>还没有感兴趣的活动</h3>
+              <p>去发现一些有趣的活动吧！</p>
+              <a href="index" class="create-meetup-btn">浏览活动</a>
+            </div>
+          </div>
+          
+          <div id="registered-tab" class="tab-pane">
+            <div id="registered-meetups" class="meetups-section"></div>
+            <div id="registered-empty" class="empty-state" style="display: none;">
+              <h3>还没有报名参加活动</h3>
+              <p>去找一些感兴趣的活动报名参加吧！</p>
+              <a href="index" class="create-meetup-btn">浏览活动</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -308,14 +435,14 @@
       return statusMap[status] || { text: '未知', class: 'status-unknown' };
     }
 
-    // 创建活动卡片
-    function createMeetupCard(meetup) {
+    // 创建我发起的活动卡片
+    function createCreatedMeetupCard(meetup) {
       const statusInfo = formatStatus(meetup.status);
       const formattedDate = TimeUtils.formatDateTimeForDisplay(meetup.datetime);
       
       // 构建管理链接，优先使用 manage_token，如果没有则使用 id
       const manageToken = meetup.manage_token || meetup.id;
-      const manageUrl = `./meetup-manage.html?token=${encodeURIComponent(manageToken)}`;
+      const manageUrl = `./manage?token=${encodeURIComponent(manageToken)}`;
       
       return `
         <div class="meetup-card">
@@ -341,11 +468,62 @@
       `;
     }
 
-    // 加载用户活动
-    async function loadUserMeetups() {
+    // 创建感兴趣/已报名活动卡片
+    function createParticipantMeetupCard(meetup) {
+      const formattedDate = TimeUtils.formatDateTimeForDisplay(meetup.datetime);
+      const meetupUrl = `./meetup?id=${encodeURIComponent(meetup.id)}`;
+      
+      return `
+        <div class="meetup-card">
+          <div class="meetup-title">${meetup.title}</div>
+          <div class="meetup-meta">
+            📅 ${formattedDate} | 📍 ${meetup.location}
+          </div>
+          <div class="meetup-description">${meetup.description}</div>
+          <div class="meetup-stats">
+            <div class="stats-left">
+              <div class="stat-item">
+                👥 ${meetup.rsvp_count || 0} 人报名
+              </div>
+              <div class="stat-item">
+                👤 发起人：${meetup.organizer || '未知'}
+              </div>
+            </div>
+            <a href="${meetupUrl}" class="manage-btn">
+              📖 查看详情
+            </a>
+          </div>
+        </div>
+      `;
+    }
+
+    // 标签页切换功能
+    function initTabs() {
+      const tabButtons = document.querySelectorAll('.tab-button');
+      const tabPanes = document.querySelectorAll('.tab-pane');
+      
+      tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const targetTab = button.dataset.tab;
+          
+          // 更新按钮状态
+          tabButtons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+          
+          // 更新内容面板
+          tabPanes.forEach(pane => pane.classList.remove('active'));
+          document.getElementById(`${targetTab}-tab`).classList.add('active');
+          
+          // 加载对应的数据
+          loadTabData(targetTab);
+        });
+      });
+    }
+
+    // 加载我发起的活动
+    async function loadCreatedMeetups() {
       if (!currentUser || !currentUser.username) {
-        document.getElementById('empty-state').style.display = 'block';
-        document.getElementById('loading').style.display = 'none';
+        document.getElementById('created-empty').style.display = 'block';
         return;
       }
 
@@ -353,19 +531,90 @@
         const { apiWithCache } = await import('./scripts/apiWithCache.js');
         const meetups = await apiWithCache.getUserMeetups(currentUser.username);
         
-        document.getElementById('loading').style.display = 'none';
-        
         if (meetups && meetups.length > 0) {
-          const meetupsHtml = meetups.map(meetup => createMeetupCard(meetup)).join('');
-          document.getElementById('meetups-list').innerHTML = meetupsHtml;
-          document.getElementById('meetups-container').style.display = 'block';
+          const meetupsHtml = meetups.map(meetup => createCreatedMeetupCard(meetup)).join('');
+          document.getElementById('created-meetups').innerHTML = meetupsHtml;
         } else {
-          document.getElementById('empty-state').style.display = 'block';
+          document.getElementById('created-empty').style.display = 'block';
         }
       } catch (error) {
-        console.error('Error loading user meetups:', error);
-        document.getElementById('loading').innerHTML = '<p style="color: #f44336;">加载失败，请稍后重试</p>';
+        console.error('Error loading created meetups:', error);
+        document.getElementById('created-meetups').innerHTML = '<p style="color: #f44336;">加载失败，请稍后重试</p>';
       }
+    }
+
+    // 加载我感兴趣的活动
+    async function loadInterestedMeetups() {
+      if (!currentUser || !currentUser.username) {
+        document.getElementById('interested-empty').style.display = 'block';
+        return;
+      }
+
+      try {
+        const { apiWithCache } = await import('./scripts/apiWithCache.js');
+        // 这里需要调用获取感兴趣活动的API，暂时使用空数组
+        const meetups = [];
+        
+        if (meetups && meetups.length > 0) {
+          const meetupsHtml = meetups.map(meetup => createParticipantMeetupCard(meetup)).join('');
+          document.getElementById('interested-meetups').innerHTML = meetupsHtml;
+        } else {
+          document.getElementById('interested-empty').style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Error loading interested meetups:', error);
+        document.getElementById('interested-meetups').innerHTML = '<p style="color: #f44336;">加载失败，请稍后重试</p>';
+      }
+    }
+
+    // 加载我已报名的活动
+    async function loadRegisteredMeetups() {
+      if (!currentUser || !currentUser.username) {
+        document.getElementById('registered-empty').style.display = 'block';
+        return;
+      }
+
+      try {
+        const { apiWithCache } = await import('./scripts/apiWithCache.js');
+        // 这里需要调用获取已报名活动的API，暂时使用空数组
+        const meetups = [];
+        
+        if (meetups && meetups.length > 0) {
+          const meetupsHtml = meetups.map(meetup => createParticipantMeetupCard(meetup)).join('');
+          document.getElementById('registered-meetups').innerHTML = meetupsHtml;
+        } else {
+          document.getElementById('registered-empty').style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Error loading registered meetups:', error);
+        document.getElementById('registered-meetups').innerHTML = '<p style="color: #f44336;">加载失败，请稍后重试</p>';
+      }
+    }
+
+    // 根据标签页加载数据
+    async function loadTabData(tabType) {
+      switch (tabType) {
+        case 'created':
+          await loadCreatedMeetups();
+          break;
+        case 'interested':
+          await loadInterestedMeetups();
+          break;
+        case 'registered':
+          await loadRegisteredMeetups();
+          break;
+      }
+    }
+
+    // 显示/隐藏标签页
+    function updateTabsVisibility() {
+      const interestedTab = document.querySelector('[data-tab="interested"]');
+      const registeredTab = document.querySelector('[data-tab="registered"]');
+      
+      // 这里可以根据实际数据来决定是否显示标签页
+      // 暂时先隐藏，等有数据时再显示
+      // interestedTab.style.display = 'block';
+      // registeredTab.style.display = 'block';
     }
 
     // 初始化页面
@@ -382,8 +631,18 @@
         const welcomeText = document.getElementById('welcome-text');
         welcomeText.textContent = `欢迎回来，${currentUser.name || currentUser.username}！`;
         
-        // 加载用户活动
-        await loadUserMeetups();
+        // 初始化标签页
+        initTabs();
+        
+        // 加载我发起的活动（默认标签页）
+        await loadCreatedMeetups();
+        
+        // 更新标签页可见性
+        updateTabsVisibility();
+        
+        // 隐藏加载状态，显示标签页容器
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('tabs-container').style.display = 'block';
       } else {
         // 未登录，显示登录提示
         document.getElementById('login-prompt').style.display = 'block';

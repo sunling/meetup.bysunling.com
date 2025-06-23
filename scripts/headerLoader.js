@@ -7,12 +7,12 @@ class HeaderLoader {
   // 获取当前页面名称
   getCurrentPageName() {
     const path = window.location.pathname;
-    if (path === '/' || path === '/index.html') return 'index';
+    if (path === '/' || path === '/index.html' || path === '/index') return 'index';
     if (path.includes('new-meetup')) return 'new-meetup';
     if (path.includes('my-meetups')) return 'my-meetups';
-    if (path.includes('meetup-manage')) return 'meetup-manage';
+    if (path.includes('manage')) return 'manage';
     if (path.includes('admin')) return 'admin';
-    if (path.includes('meetup.html') || path.includes('meetup?')) return 'meetup';
+    if (path.includes('meetup.html') || path.includes('meetup?') || path.includes('meetup') && !path.includes('meetup-') && !path.includes('my-meetup')) return 'meetup';
     return '';
   }
 

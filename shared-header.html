@@ -13,7 +13,8 @@
       <nav class="header-nav">
         <a href="/" class="nav-link" data-page="index">首页</a>
         <a href="new-meetup" class="nav-link" data-page="new-meetup">发起活动</a>
-        <a href="meetup-manage" class="nav-link guest-only" data-page="meetup-manage" style="display: block;">组织者入口</a>
+        <a href="/my-meetups" class="nav-link user-only" data-page="my-meetups">我发起的活动</a>
+        <a href="manage" class="nav-link guest-only" data-page="manage" style="display: block;">组织者入口</a>
       </nav>
       <div class="auth-section">
         <div id="auth-info" class="auth-info" style="display: none;">
@@ -25,7 +26,6 @@
               </svg>
             </button>
             <div class="user-dropdown-menu" id="user-dropdown-menu">
-              <a href="/my-meetups" class="dropdown-item">我发起的活动</a>
               <button id="logout-btn" class="dropdown-item logout-item">退出登录</button>
             </div>
           </div>

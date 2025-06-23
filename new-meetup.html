@@ -281,7 +281,7 @@
             window.location.href = `${window.location.origin}/my-meetups`;
           } else {
             // 未登录用户跳转到活动管理页
-            const manageLink = `${window.location.origin}/meetup-manage?token=${result.manage_token}`;
+            const manageLink = `${window.location.origin}/manage?token=${result.manage_token}`;
             window.location.href = manageLink;
           }
         } else {

@@ -102,6 +102,8 @@ class AuthManager {
   logout() {
     this.currentUser = null;
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('isAdmin');
     this.updateUI();
   }
 
