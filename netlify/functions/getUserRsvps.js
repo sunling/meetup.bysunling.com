@@ -46,12 +46,12 @@ export async function handler(event) {
     // Add filters based on available identifiers
     if (username) {
       query = query.eq('username', username);
-    } else if (name && wechat_id) {
-      query = query.eq('name', name).eq('wechat_id', wechat_id);
-    } else if (name) {
-      query = query.eq('name', name);
-    } else if (wechat_id) {
-      query = query.eq('wechat_id', wechat_id);
+    // } else if (name && wechat_id) {
+    //   query = query.eq('name', name).eq('wechat_id', wechat_id);
+    // } else if (name) {
+    //   query = query.eq('name', name);
+    // } else if (wechat_id) {
+    //   query = query.eq('wechat_id', wechat_id);
     }
 
     // Filter by RSVP status if specified
