@@ -26,12 +26,18 @@ export async function handler(event) {
       };
     }
 
-    // Build query conditions
+    // Build base query
     let query = supabase
       .from('meetup_rsvps')
       .select(`
-        *,
-        meetups!inner(
+        id,
+        meetup_id,
+        name,
+        wechat_id,
+        status,
+        created_at,
+        username,
+        meetups:meetup_id (
           id,
           title,
           description,
@@ -43,27 +49,24 @@ export async function handler(event) {
         )
       `);
 
-    // Add filters based on available identifiers
+    // Add filters
     if (username) {
       query = query.eq('username', username);
-    // } else if (name && wechat_id) {
-    //   query = query.eq('name', name).eq('wechat_id', wechat_id);
-    // } else if (name) {
-    //   query = query.eq('name', name);
-    // } else if (wechat_id) {
-    //   query = query.eq('wechat_id', wechat_id);
+    } else if (name && wechat_id) {
+      query = query.eq('name', name).eq('wechat_id', wechat_id);
+    } else if (name) {
+      query = query.eq('name', name);
+    } else if (wechat_id) {
+      query = query.eq('wechat_id', wechat_id);
     }
 
-    // Filter by RSVP status if specified
     if (status) {
       query = query.eq('status', status);
     }
 
-    // Only include approved meetups (or legacy null status)
-    // query = query.or('status.eq.approved,status.is.null');
-    query = query.filter('meetups.status', 'in', '(approved,null)');
+    // 只返回 approved/null 的 meetup
+    // query = query.or('meetups.status.eq.approved,meetups.status.is.null');
 
-    // Order by creation date (newest first)
     query = query.order('created_at', { ascending: false });
 
     const { data: rsvps, error } = await query;
@@ -75,26 +78,24 @@ export async function handler(event) {
       };
     }
 
-    // Transform the data to include meetup details at the top level
+    // Transform response
     const transformedRsvps = rsvps.map(rsvp => ({
       rsvp_id: rsvp.id,
       rsvp_status: rsvp.status,
       rsvp_created_at: rsvp.created_at,
       ...rsvp.meetups,
-      // Add RSVP count for each meetup
-      rsvp_count: 0 // Will be populated separately if needed
+      rsvp_count: 0
     }));
 
-    // Get RSVP counts for each meetup
+    // Count RSVPs going for each meetup
     const meetupIds = transformedRsvps.map(item => item.id);
     if (meetupIds.length > 0) {
       const { data: counts } = await supabase
         .from('meetup_rsvps')
         .select('meetup_id')
-        .in('meetup_id', meetupIds)
+        .in('meetup_id', meetupIds.map(String)) // ensure match type
         .eq('status', 'going');
 
-      // Count RSVPs for each meetup
       const countMap = {};
       if (counts) {
         counts.forEach(item => {
@@ -102,7 +103,6 @@ export async function handler(event) {
         });
       }
 
-      // Add counts to transformed data
       transformedRsvps.forEach(item => {
         item.rsvp_count = countMap[item.id] || 0;
       });
