@@ -60,7 +60,8 @@ export async function handler(event) {
     }
 
     // Only include approved meetups (or legacy null status)
-    query = query.or('meetups.status.eq.approved,meetups.status.is.null');
+    // query = query.or('status.eq.approved,status.is.null');
+    query = query.filter('meetups.status', 'in', '(approved,null)');
 
     // Order by creation date (newest first)
     query = query.order('created_at', { ascending: false });
