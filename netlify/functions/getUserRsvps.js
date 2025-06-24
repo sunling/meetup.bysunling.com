@@ -60,7 +60,7 @@ export async function handler(event) {
     }
 
     // Only include approved meetups (or legacy null status)
-    query = query.or('meetups.status.eq.approved,meetups.status.is.null', { foreignTable: 'meetups' });
+    query = query.or('meetups.status.eq.approved,meetups.status.is.null');
 
     // Order by creation date (newest first)
     query = query.order('created_at', { ascending: false });
