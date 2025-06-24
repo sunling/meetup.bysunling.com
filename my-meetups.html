@@ -542,12 +542,7 @@
         const rsvpData = await apiWithCache.getUserInterestedMeetups(currentUser.username);
         
         if (rsvpData && rsvpData.length > 0) {
-          // 提取嵌套的meetups数据
-          const meetups = rsvpData.map(rsvp => ({
-            ...rsvp.meetups,
-            rsvp_count: rsvp.rsvp_count
-          }));
-          const meetupsHtml = meetups.map(meetup => createParticipantMeetupCard(meetup)).join('');
+          const meetupsHtml = rsvpData.map(meetup => createParticipantMeetupCard(meetup)).join('');
           document.getElementById('interested-meetups').innerHTML = meetupsHtml;
         } else {
           document.getElementById('interested-empty').style.display = 'block';
@@ -567,14 +562,9 @@
 
       try {
         const { apiWithCache } = await import('./scripts/apiWithCache.js');
-        const rsvpData = await apiWithCache.getUserRegisteredMeetups(currentUser.username);
+        const meetups = await apiWithCache.getUserRegisteredMeetups(currentUser.username);
         
-        if (rsvpData && rsvpData.length > 0) {
-          // 提取嵌套的meetups数据
-          const meetups = rsvpData.map(rsvp => ({
-            ...rsvp.meetups,
-            rsvp_count: rsvp.rsvp_count
-          }));
+        if (meetups && meetups.length > 0) {
           const meetupsHtml = meetups.map(meetup => createParticipantMeetupCard(meetup)).join('');
           document.getElementById('registered-meetups').innerHTML = meetupsHtml;
         } else {
