@@ -7,7 +7,7 @@
   <title>我的活动 - 聚友圈</title>
   <link rel="stylesheet" href="./styles/shared.css">
   <script src="./scripts/timeUtils.js"></script>
-  <script src="https://bysunling.com/scripts/auth-utils.js"></script>
+  <script src="scripts/auth-utils.js"></script>
   <script type="module" src="scripts/headerLoader.js"></script>
   <script type="module" src="scripts/footerLoader.js"></script>
   <style>
@@ -354,7 +354,7 @@
     <div id="login-prompt" class="login-prompt" style="display: none;">
       <h2>请先登录</h2>
       <p>登录后即可查看您发起和参与的活动</p>
-      <a href="https://bysunling.com/auth?redirect=https://meetup.bysunling.com/my-meetups" class="btn btn-primary">立即登录</a>
+      <a href="auth.html?redirect=my-meetups.html" class="btn btn-primary">立即登录</a>
     </div>
 
     <!-- 已登录状态 -->
@@ -367,8 +367,8 @@
       <div id="tabs-container" class="tabs-container" style="display: none;">
         <div class="tabs-nav">
           <button class="tab-button active" data-tab="created">我发起的活动</button>
-          <button class="tab-button" data-tab="interested">我感兴趣的活动</button>
           <button class="tab-button" data-tab="registered">我已报名的活动</button>
+          <button class="tab-button" data-tab="interested">我感兴趣的活动</button>
         </div>
         
         <div class="tab-content">
@@ -604,7 +604,18 @@
     // 初始化页面
     async function initPage() {
       // 检查用户登录状态
-      currentUser = await window.unifiedAuth.getCurrentUser();
+      const authToken = localStorage.getItem('auth_token');
+       if (authToken) {
+         const userStr = localStorage.getItem('auth_user');
+        if (userStr) {
+          try {
+            currentUser = JSON.parse(userStr);
+          } catch (e) {
+            console.warn('Failed to parse user from localStorage:', e);
+            currentUser = null;
+          }
+        }
+      }
       
       if (currentUser) {
         // 已登录，显示用户内容
@@ -665,7 +676,7 @@
   </script>
   
   <!-- Unified Auth Script -->
-  <script type="module" src="./scripts/auth.js"></script>
+  
 </body>
 
 </html>

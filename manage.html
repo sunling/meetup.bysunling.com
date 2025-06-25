@@ -433,6 +433,8 @@
 
   <script type="module">
     async function loadMeetupData() {
+
+      
       const token = new URLSearchParams(window.location.search).get("token");
       if (!token) {
         // 显示token输入界面
@@ -975,10 +977,9 @@
   <div id="shared-footer-container"></div>
 
   <!-- Auth Utils Script -->
-  <script src="https://bysunling.com/scripts/auth-utils.js"></script>
+  <script src="scripts/auth-utils.js"></script>
   
-  <!-- Unified Auth Script -->
-  <script type="module" src="./scripts/auth.js"></script>
+
 
 </body>
 

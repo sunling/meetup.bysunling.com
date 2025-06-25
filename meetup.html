@@ -728,9 +728,15 @@
 
       // 如果没有匹配，尝试通过已登录用户的username匹配
       try {
-        const currentUser = await window.unifiedAuth.getCurrentUser();
-        if (currentUser && currentUser.username && item.username === currentUser.username) {
-          return true;
+        const authToken = localStorage.getItem('auth_token');
+        if (authToken) {
+          const userStr = localStorage.getItem('auth_user');
+          if (userStr) {
+            const currentUser = JSON.parse(userStr);
+            if (currentUser && currentUser.username && item.username === currentUser.username) {
+              return true;
+            }
+          }
         }
       } catch (error) {
         console.log('无法获取登录用户信息:', error);
@@ -752,10 +758,16 @@
 
       // 如果没有找到，尝试通过已登录用户的username匹配
       try {
-        const currentUser = await window.unifiedAuth.getCurrentUser();
-        if (currentUser && currentUser.username) {
-          const usernameMatch = allRsvps.find(item => item.username === currentUser.username);
-          if (usernameMatch) return usernameMatch;
+        const authToken = localStorage.getItem('auth_token');
+          if (authToken) {
+            const userStr = localStorage.getItem('auth_user');
+          if (userStr) {
+            const currentUser = JSON.parse(userStr);
+            if (currentUser && currentUser.username) {
+              const usernameMatch = allRsvps.find(item => item.username === currentUser.username);
+              if (usernameMatch) return usernameMatch;
+            }
+          }
         }
       } catch (error) {
         console.log('无法获取登录用户信息:', error);
@@ -794,12 +806,22 @@
       } else {
         // 如果没有本地用户数据，尝试使用当前登录用户的信息
         try {
-          const currentUser = await window.unifiedAuth.getCurrentUser();
-          if (currentUser && currentUser.name) {
-            nameField.value = currentUser.name;
-            // 如果有微信号信息也自动填充
-            if (currentUser.wechat) {
-              wechatField.value = currentUser.wechat;
+          const authToken = localStorage.getItem('auth_token');
+           if (authToken) {
+             const userStr = localStorage.getItem('auth_user');
+            if (userStr) {
+              const currentUser = JSON.parse(userStr);
+              if (currentUser && currentUser.name) {
+                nameField.value = currentUser.name;
+                // 如果有微信号信息也自动填充
+                if (currentUser.wechat) {
+                  wechatField.value = currentUser.wechat;
+                }
+              } else {
+                document.getElementById('rsvp-form').reset();
+              }
+            } else {
+              document.getElementById('rsvp-form').reset();
             }
           } else {
             document.getElementById('rsvp-form').reset();
@@ -840,8 +862,14 @@
       // 检查用户登录状态
       let isLoggedIn = false;
       try {
-        const currentUser = await window.unifiedAuth.getCurrentUser();
-        isLoggedIn = !!(currentUser && currentUser.username);
+        const authToken = localStorage.getItem('auth_token');
+        if (authToken) {
+          const userStr = localStorage.getItem('auth_user');
+          if (userStr) {
+            const currentUser = JSON.parse(userStr);
+            isLoggedIn = !!(currentUser && currentUser.username);
+          }
+        }
       } catch (error) {
         console.log('无法获取登录用户信息:', error);
         isLoggedIn = false;
@@ -1209,7 +1237,18 @@
 
       try {
         // 检查用户是否已登录，如果已登录则获取username
-        const currentUser = await window.unifiedAuth.getCurrentUser();
+        const authToken = localStorage.getItem('auth_token');
+        let currentUser = null;
+        if (authToken) {
+          const userStr = localStorage.getItem('auth_user');
+          if (userStr) {
+            try {
+              currentUser = JSON.parse(userStr);
+            } catch (e) {
+              console.warn('Failed to parse user from localStorage:', e);
+            }
+          }
+        }
         
         // 构建提交数据
         const submitData = { meetup_id, name, wechat_id: wechat, status };
@@ -1359,10 +1398,10 @@
   <div id="shared-footer-container"></div>
 
   <!-- Auth Utils Script -->
-  <script src="https://bysunling.com/scripts/auth-utils.js"></script>
+  <script src="scripts/auth-utils.js"></script>
   
   <!-- Unified Auth Script -->
-  <script type="module" src="./scripts/auth.js"></script>
+  
 
 </body>
 

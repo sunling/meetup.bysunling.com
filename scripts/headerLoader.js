@@ -24,11 +24,15 @@ class HeaderLoader {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const headerHtml = await response.text();
-      
+
       // 查找header容器并插入内容
       const headerContainer = document.getElementById('shared-header-container');
       if (headerContainer) {
         headerContainer.innerHTML = headerHtml;
+        
+        // 等待DOM更新后再执行后续操作
+        await new Promise(resolve => setTimeout(resolve, 0));
+        
         this.setActiveNavLink();
         this.updateLoginRedirect();
       } else {
@@ -56,8 +60,10 @@ class HeaderLoader {
     const loginBtn = document.getElementById('login-btn');
     if (loginBtn) {
       const currentUrl = window.location.href;
-      const redirectUrl = `https://bysunling.com/auth?redirect=${encodeURIComponent(currentUrl)}`;
+      const redirectUrl = `auth.html?redirect=${encodeURIComponent(currentUrl)}`;
       loginBtn.href = redirectUrl;
+    } else {
+      console.warn('登录按钮未找到，无法更新重定向URL');
     }
   }
 
@@ -87,56 +93,87 @@ class HeaderLoader {
           e.stopPropagation();
         });
       }
+
+      // 退出登录功能
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+          // 清除认证信息
+           localStorage.removeItem('auth_token');
+           localStorage.removeItem('auth_user');
+           localStorage.removeItem('isAdmin');
+
+          // 如果在my-meetups.html页面，跳转到组织者入口页面
+          if (window.location.pathname.includes('my-meetups')) {
+            window.location.href = '/manage';
+          } else {
+            // 其他页面刷新页面以更新状态
+            window.location.reload();
+          }
+        });
+      }
     }
   }
 
-  // 等待统一认证系统加载
-  async waitForUnifiedAuth(maxWait = 3000) {
-    const startTime = Date.now();
-    while (!window.unifiedAuth && (Date.now() - startTime) < maxWait) {
-      await new Promise(resolve => setTimeout(resolve, 50));
+  // 更新用户信息显示
+  updateUserInfo(isLoggedIn) {
+    const authInfo = document.getElementById('auth-info');
+    const loginBtn = document.getElementById('login-btn');
+    const userNameElement = document.getElementById('user-name');
+
+    if (isLoggedIn) {
+      // 获取用户信息
+      const userStr = localStorage.getItem('auth_user');
+      let user = null;
+      if (userStr) {
+        try {
+          user = JSON.parse(userStr);
+        } catch (e) {
+          console.error('解析用户信息失败:', e);
+        }
+      }
+
+      if (user && authInfo && loginBtn && userNameElement) {
+        // 显示用户信息，隐藏登录按钮
+        authInfo.style.display = 'block';
+        loginBtn.style.display = 'none';
+        userNameElement.textContent = user.name || user.username || '用户';
+      }
+    } else {
+      // 显示登录按钮，隐藏用户信息
+      if (authInfo) {
+        authInfo.style.display = 'none';
+      }
+      if (loginBtn) {
+        loginBtn.style.display = 'block';
+      }
     }
   }
 
   // 根据用户状态更新导航显示
-  async updateNavForUserStatus() {
-    // 等待统一认证系统加载
-    await this.waitForUnifiedAuth();
-    
-    // 检查用户登录状态 - 使用统一认证系统
-    let isLoggedIn = false;
-    
-    // 优先使用统一认证系统检查
-    if (window.unifiedAuth) {
-      try {
-        isLoggedIn = await window.unifiedAuth.isLoggedIn();
-      } catch (error) {
-        console.warn('Failed to check login status with unifiedAuth:', error);
-        // 降级到localStorage检查
-        isLoggedIn = !!(localStorage.getItem('authToken') || localStorage.getItem('userToken'));
-      }
-    } else {
-      // 降级方案：检查多种可能的token存储
-      isLoggedIn = !!(localStorage.getItem('authToken') || 
-                     localStorage.getItem('userToken') || 
-                     new URLSearchParams(window.location.search).get('token'));
-    }
-    
+  updateNavForUserStatus() {
+    // 检查用户登录状态 - 使用正确的localStorage键名
+     const isLoggedIn = !!(localStorage.getItem('auth_token') || 
+                          new URLSearchParams(window.location.search).get('token'));
+
     // 检查管理员权限
     const isAdmin = localStorage.getItem('isAdmin') === 'true';
-    
+
+    // 更新用户信息显示
+    this.updateUserInfo(isLoggedIn);
+
     // 显示/隐藏访客专属导航（未登录用户）
     const guestOnlyLinks = document.querySelectorAll('.guest-only');
     guestOnlyLinks.forEach(link => {
       link.style.display = isLoggedIn ? 'none' : 'block';
     });
-    
+
     // 显示/隐藏用户专属导航
     const userOnlyLinks = document.querySelectorAll('.user-only');
     userOnlyLinks.forEach(link => {
       link.style.display = isLoggedIn ? 'block' : 'none';
     });
-    
+
     // 显示/隐藏管理员专属导航
     const adminOnlyLinks = document.querySelectorAll('.admin-only');
     adminOnlyLinks.forEach(link => {
@@ -147,32 +184,20 @@ class HeaderLoader {
   // 初始化
   async init() {
     await this.loadHeader();
-    await this.updateNavForUserStatus();
+    this.updateNavForUserStatus();
     this.initUserDropdown();
-    
+
     // 监听localStorage变化，动态更新导航
     window.addEventListener('storage', () => {
       this.updateNavForUserStatus();
     });
-    
-    // 等待统一认证系统加载后设置监听器
-    await this.waitForUnifiedAuth();
-    if (window.unifiedAuth) {
-      // 监听认证状态变化
-      const checkAuthChange = async () => {
-        await this.updateNavForUserStatus();
-      };
-      
-      // 监听页面可见性变化
-      document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
-          setTimeout(checkAuthChange, 200);
-        }
-      });
-      
-      // 定期检查认证状态变化（降低频率）
-      setInterval(checkAuthChange, 2000);
-    }
+
+    // 监听页面可见性变化
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        setTimeout(() => this.updateNavForUserStatus(), 200);
+      }
+    });
   }
 }
 
